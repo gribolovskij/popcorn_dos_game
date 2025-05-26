@@ -122,15 +122,14 @@ void Draw_Brick(HDC hdc, int x, int y, bool is_purple)
 	{
 		pen = CreatePen(PS_SOLID, 0, RGB(84, 254, 251));								 // Создаем цвет для 1-ого кирпича
 		brush = CreateSolidBrush(RGB(84, 254, 251));
-	}
-	else
-	{
-		pen = CreatePen(PS_SOLID, 0, RGB(255, 83, 253));								 // Создаем цвет для 2-ого кирпича
-		brush = CreateSolidBrush(RGB(255, 83, 253));
+		
+		break;
+
+	default: return;
 	}
 	SelectObject(hdc, pen);
 	SelectObject(hdc, brush);
-	Rectangle(hdc, x * Global_Scale, y * Global_Scale, Brick_Width + x * Global_Scale, Brick_Height + y * Global_Scale);	// Кирпич - рисуем
+	RoundRect(hdc, x * Global_Scale, y * Global_Scale, Brick_Width + x * Global_Scale, Brick_Height + y * Global_Scale, 10*Global_Scale, 32*Global_Scale);	// Кирпич - рисуем
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Frame(HDC hdc)
