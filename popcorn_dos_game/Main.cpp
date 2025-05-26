@@ -15,6 +15,9 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+HPEN Purple_Brick_Pen, Blue_Brick_Pen;
+HBRUSH Purple_Brick_Brush, Blue_Brick_Brush;
+
 const int Global_Scale = 1;
 const int Brick_Width = 61;
 const int Brick_Height = 23;
@@ -22,6 +25,34 @@ const int Cell_Width = 64;
 const int Cell_Height = 26;
 const int Level_X_Offset = 23;
 const int Level_Y_Offset = 13;
+
+
+enum Ebrick_Type
+{
+	EBT_None,
+	EBT_Purple,
+	EBT_Blue,
+};
+
+char Level_01[14][12] =
+{
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+
+};
+
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_opt_ HINSTANCE hPrevInstance,
@@ -60,6 +91,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	return (int) msg.wParam;
 }
+
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //  FUNCTION: MyRegisterClass()              ФУНКЦИЯ: MyRegisterClass()
 //  PURPOSE: Registers the window class.     НАЗНАЧЕНИЕ: Регистрирует класс окна.
@@ -84,6 +116,16 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
    return RegisterClassExW(&wcex);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void Init()
+//	Функция инициализации |=|=|=| Настройка игры при старте
+{
+	Purple_Brick_Pen = CreatePen(PS_SOLID, 0, RGB(84, 254, 251));								 // Создаем цвет для 1-ого кирпича
+	Purple_Brick_Brush = CreateSolidBrush(RGB(84, 254, 251));
+
+	Blue_Brick_Pen = CreatePen(PS_SOLID, 0, RGB(255, 83, 253));								 // Создаем цвет для 2-ого кирпича
+	Blue_Brick_Brush = CreateSolidBrush(RGB(255, 83, 253));
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //   FUNCTION: InitInstance(HINSTANCE, int)                                         ФУНКЦИЯ: InitInstance(HINSTANCE, int)
 //   PURPOSE: Saves instance handle and creates main window                         НАЗНАЧЕНИЕ: Сохраняет дескриптор экземпляра и создает главное окно
 // 
@@ -93,6 +135,8 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
    hInst = hInstance; // Store instance handle in our global variable				Сохраняем дескриптор экземпляра в нашей глобальной переменной
+
+   Init();																			// Функция инициализации
 
    RECT window_rect;																// Создаем пользовательский размер окна для разных систем, где меню игры может различаться
    window_rect.left = 0;
@@ -114,14 +158,25 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    return TRUE;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void Draw_Brick(HDC hdc, int x, int y, bool is_purple)
-{//	Вывод кирпича
+void Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
+//	Вывод кирпича
+{
 	HPEN pen;
 	HBRUSH brush;
-	if (is_purple)
+
+	switch (brick_type)
 	{
-		pen = CreatePen(PS_SOLID, 0, RGB(84, 254, 251));								 // Создаем цвет для 1-ого кирпича
-		brush = CreateSolidBrush(RGB(84, 254, 251));
+	case EBT_None:	return;
+
+	case EBT_Purple:
+		pen = Purple_Brick_Pen;								 // Создаем цвет для 2-ого кирпича
+		brush = Purple_Brick_Brush;
+
+		break;
+
+	case EBT_Blue:
+		pen = Blue_Brick_Pen;								 // Создаем цвет для 1-ого кирпича
+		brush = Blue_Brick_Brush;
 		
 		break;
 
@@ -129,16 +184,25 @@ void Draw_Brick(HDC hdc, int x, int y, bool is_purple)
 	}
 	SelectObject(hdc, pen);
 	SelectObject(hdc, brush);
-	RoundRect(hdc, x * Global_Scale, y * Global_Scale, Brick_Width + x * Global_Scale, Brick_Height + y * Global_Scale, 10*Global_Scale, 32*Global_Scale);	// Кирпич - рисуем
+	RoundRect(hdc, x * Global_Scale, y * Global_Scale, Brick_Width + x * Global_Scale, Brick_Height + y * Global_Scale, 10*Global_Scale, 32*Global_Scale);	
+
+	// Кирпич - рисуем
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void Draw_Level(HDC hdc)
+//	Вывод всех кирпичей уровня
+{
+int i,j;
+
+for (i = 0; i < 14; i++)	
+	for (j = 0; j< 12; j++) 
+		Draw_Brick(hdc, Level_X_Offset + j * Cell_Width, Level_Y_Offset + i * Cell_Height, (Ebrick_Type)Level_01[i][j]);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Frame(HDC hdc)
-{//	Отрисовка экрана игры
-	int i,j;
-
-	for (i = 0; i < 14; i++)	
-		for (j = 0; j< 12; j++) 
-			Draw_Brick(hdc, Level_X_Offset + j * Cell_Width, Level_Y_Offset + i * Cell_Height, true);
+//	Отрисовка экрана игры
+{
+	Draw_Level(hdc);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)									ФУНКЦИЯ: WndProc(HWND, UINT, WPARAM, LPARAM)
