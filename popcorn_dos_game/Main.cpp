@@ -15,45 +15,6 @@ BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-HPEN Purple_Brick_Pen, Blue_Brick_Pen;
-HBRUSH Purple_Brick_Brush, Blue_Brick_Brush;
-
-const int Global_Scale = 1;
-const int Brick_Width = 61;
-const int Brick_Height = 23;
-const int Cell_Width = 64;
-const int Cell_Height = 26;
-const int Level_X_Offset = 23;
-const int Level_Y_Offset = 13;
-
-
-enum Ebrick_Type
-{
-	EBT_None,
-	EBT_Purple,
-	EBT_Blue,
-};
-
-char Level_01[14][12] =
-{
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
-};
-
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					 _In_opt_ HINSTANCE hPrevInstance,
 					 _In_ LPWSTR    lpCmdLine,
@@ -108,22 +69,12 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
    wcex.hInstance = hInstance;
    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_POPCORNDOSGAME));
    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-   wcex.hbrBackground = CreateSolidBrush(RGB(0, 0, 0));								//(HBRUSH)(COLOR_WINDOW + 1);
+   wcex.hbrBackground = CreateSolidBrush(RGB(3, 105, 24));								//(HBRUSH)(COLOR_WINDOW + 1);
    wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_POPCORNDOSGAME);
    wcex.lpszClassName = szWindowClass;
    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
   
    return RegisterClassExW(&wcex);
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void Init()
-//	Функция инициализации |=|=|=| Настройка игры при старте
-{
-	Purple_Brick_Pen = CreatePen(PS_SOLID, 0, RGB(84, 254, 251));								 // Создаем цвет для 1-ого кирпича
-	Purple_Brick_Brush = CreateSolidBrush(RGB(84, 254, 251));
-
-	Blue_Brick_Pen = CreatePen(PS_SOLID, 0, RGB(255, 83, 253));								 // Создаем цвет для 2-ого кирпича
-	Blue_Brick_Brush = CreateSolidBrush(RGB(255, 83, 253));
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //   FUNCTION: InitInstance(HINSTANCE, int)                                         ФУНКЦИЯ: InitInstance(HINSTANCE, int)
@@ -156,55 +107,6 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    UpdateWindow(hWnd);
 
    return TRUE;
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
-//	Вывод кирпича
-{
-	HPEN pen;
-	HBRUSH brush;
-
-	switch (brick_type)
-	{
-	case EBT_None:	return;
-
-	case EBT_Purple:
-		pen = Purple_Brick_Pen;								 // Создаем цвет для 2-ого кирпича
-		brush = Purple_Brick_Brush;
-
-		break;
-
-	case EBT_Blue:
-		pen = Blue_Brick_Pen;								 // Создаем цвет для 1-ого кирпича
-		brush = Blue_Brick_Brush;
-		
-		break;
-
-	default: return;
-	}
-	SelectObject(hdc, pen);
-	SelectObject(hdc, brush);
-	RoundRect(hdc, x * Global_Scale, y * Global_Scale, Brick_Width + x * Global_Scale, Brick_Height + y * Global_Scale, 10*Global_Scale, 32*Global_Scale);	
-
-	// Кирпич - рисуем
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void Draw_Level(HDC hdc)
-//	Вывод всех кирпичей уровня
-{
-int i,j;
-
-for (i = 0; i < 14; i++)	
-	for (j = 0; j< 12; j++) 
-		Draw_Brick(hdc, Level_X_Offset + j * Cell_Width, Level_Y_Offset + i * Cell_Height, (Ebrick_Type)Level_01[i][j]);
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void Draw_Frame(HDC hdc)
-//	Отрисовка экрана игры
-{
-	Draw_Level(hdc);
-{//	Отрисовка экрана игры
-
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)									ФУНКЦИЯ: WndProc(HWND, UINT, WPARAM, LPARAM)
