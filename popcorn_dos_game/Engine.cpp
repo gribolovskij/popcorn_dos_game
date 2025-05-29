@@ -17,6 +17,9 @@ const int Cell_Width = 64;
 const int Cell_Height = 26;
 const int Level_X_Offset = 23;
 const int Level_Y_Offset = 13;
+const int Circle_Size = 20;
+
+int Inner_Width = 40;
 
 char Level_01[14][12] =
 {
@@ -34,7 +37,6 @@ char Level_01[14][12] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Init()
@@ -46,11 +48,11 @@ void Init()
 	Purple_Brick_Pen = CreatePen(PS_SOLID, 0, RGB(255, 182, 89));								 // Создаем цвет для 2-ого кирпича
 	Purple_Brick_Brush = CreateSolidBrush(RGB(255, 182, 89));
 
-	Platform_Circle_Pen = CreatePen(PS_SOLID, 0, RGB(234, 206, 15));
-	Platform_Circle_Brush = CreateSolidBrush(RGB(234, 206, 15));
+	Platform_Circle_Pen = CreatePen(PS_SOLID, 0, RGB(155, 0, 0));
+	Platform_Circle_Brush = CreateSolidBrush(RGB(155, 0, 0));
 
-	Platform_Inner_Pen = CreatePen(PS_SOLID, 0, RGB(0, 0, 255));
-	Platform_Inner_Brush = CreateSolidBrush(RGB(0, 0, 255));
+	Platform_Inner_Pen = CreatePen(PS_SOLID, 0, RGB(249, 100, 0));
+	Platform_Inner_Brush = CreateSolidBrush(RGB(249, 100, 0));
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
@@ -95,28 +97,21 @@ void Draw_Level(HDC hdc)
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Platform(HDC hdc, int x, int y)
-//	
+//	Рисуем платформу
 {
-	HPEN pen;														// Красим шарики платформы
-	HBRUSH brush;
+	// Красим шарики платформы
 
-	pen = Platform_Circle_Pen;								
-	brush = Platform_Circle_Brush;	
-	SelectObject(hdc, pen);
-	SelectObject(hdc, brush);
-	Ellipse(hdc, x, y, x+20, y+20);
-	Ellipse(hdc, x+60, y, x+80, y+20);
+	SelectObject(hdc, Platform_Circle_Pen);
+	SelectObject(hdc, Platform_Circle_Brush);
+	Ellipse(hdc, x, y, x + Circle_Size* Global_Scale, y + Circle_Size * Global_Scale);
+	Ellipse(hdc, x + (Circle_Size+Inner_Width), y, x + ((Circle_Size*2)+Inner_Width), y+ Circle_Size);
 
+	// Красим середину платформы
 
-	HPEN pen_in;													// Красим середину платформы
-	HBRUSH brush_in;
-
-	pen_in = Platform_Inner_Pen;								
-	brush_in = Platform_Inner_Brush;	
-	SelectObject(hdc, pen_in);
-	SelectObject(hdc, brush_in);
-	RoundRect(hdc, x+9, y+18, x+70, y+Global_Scale*2, 10 * Global_Scale, 32 * Global_Scale);
-
+	SelectObject(hdc, Platform_Inner_Pen);
+	SelectObject(hdc, Platform_Inner_Brush);
+	RoundRect(hdc, x+9, y+18, x + (Inner_Width + 31), y+Global_Scale*2, 10 * Global_Scale, 32 * Global_Scale);
+						//x+ Inner_Width Расстояние между шариками, может увеличиваться!!!
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Frame(HDC hdc)
