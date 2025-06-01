@@ -1,4 +1,6 @@
 #include "Engine.h"
+#define _USE_MATH_DEFINES
+#include "math.h"
 
 enum Ebrick_Type
 {
@@ -8,7 +10,7 @@ enum Ebrick_Type
 };
 
 HPEN Purple_Brick_Pen, Blue_Brick_Pen, Platform_Circle_Pen, Platform_Inner_Pen, Arc_Pen;
-HBRUSH Purple_Brick_Brush, Blue_Brick_Brush, Platform_Circle_Brush, Platform_Inner_Brush;
+HBRUSH Purple_Brick_Brush, Blue_Brick_Brush, Platform_Circle_Brush, Platform_Inner_Brush, Arc_Brush;
 
 const int Global_Scale = 1;
 const int Brick_Width = 61;
@@ -18,6 +20,7 @@ const int Cell_Height = 26;
 const int Level_X_Offset = 23;
 const int Level_Y_Offset = 13;
 const int Circle_Size = 20;
+const int Volume_Rectangle = 59;
 
 int Inner_Width = 40;
 
@@ -52,9 +55,8 @@ void Init()
 	Create_Pen_Brush(255, 182, 89, Purple_Brick_Pen, Purple_Brick_Brush);
 	Create_Pen_Brush(155, 0, 0, Platform_Circle_Pen, Platform_Circle_Brush);
 	Create_Pen_Brush(249, 100, 0, Platform_Inner_Pen, Platform_Inner_Brush);
-
-	Arc_Pen = CreatePen(PS_SOLID, 0, RGB(255, 255, 255));
-}
+	Create_Pen_Brush(255, 255, 255, Arc_Pen, Arc_Brush);
+	}
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
 //	Вывод кирпича
@@ -87,6 +89,61 @@ void Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
 	// Кирпич - рисуем
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void Draw_Brick_Letter(HDC hdc, int x, int y, int rotation_step)
+//	Отрисовка падающего кирпича с буквой
+{
+	double offset;
+	double rotation_angle = 2.0 * M_PI / 16 * (double)rotation_step;		// Преобразование шага в угол поворота
+	int brick_half_height = (Brick_Height / 2);
+	int back_part_offset;
+	XFORM xForm, old_xForm;
+
+	if (rotation_step == 4 || rotation_step == 12)
+	{
+		// Выводим фон
+		SelectObject(hdc, Purple_Brick_Pen);
+		SelectObject(hdc, Purple_Brick_Brush);
+
+		Rectangle(hdc, x, y + brick_half_height - 3, x + Volume_Rectangle, y + brick_half_height);
+
+		// Выводим передний план
+		SelectObject(hdc, Blue_Brick_Pen);
+		SelectObject(hdc, Blue_Brick_Brush);
+
+		Rectangle(hdc, x, y + brick_half_height , x + Volume_Rectangle, y + brick_half_height + 3);
+	}
+	else
+	{
+		SetGraphicsMode(hdc, GM_ADVANCED);
+
+		// Настраиваем матрицу "переворота" буквы
+		xForm.eM11 = 1.0f;
+		xForm.eM12 = 0.0f;
+		xForm.eM21 = 0.0f;
+		xForm.eM22 = (float)cos(rotation_angle);
+		xForm.eDx  = (float)x;
+		xForm.eDy  = (float)y + (float)brick_half_height;
+		GetWorldTransform(hdc, &old_xForm);
+		SetWorldTransform(hdc, &xForm);
+
+	 //	Выводим фон
+		SelectObject(hdc, Blue_Brick_Pen);
+		SelectObject(hdc, Blue_Brick_Brush);
+
+		offset = (1.0 - fabs(xForm.eM22)) * 12;
+		back_part_offset = (int)round(offset);
+		Rectangle(hdc, 0, -brick_half_height - back_part_offset, Volume_Rectangle, brick_half_height - back_part_offset);
+
+	// Выводим передний план
+		SelectObject(hdc, Purple_Brick_Pen);
+		SelectObject(hdc, Purple_Brick_Brush);
+
+		Rectangle(hdc, 0, -brick_half_height, Volume_Rectangle, brick_half_height);
+
+		SetWorldTransform(hdc, &old_xForm);
+	}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Level(HDC hdc)
 //	Вывод всех кирпичей уровня
 {
@@ -110,7 +167,7 @@ void Draw_Platform(HDC hdc, int x, int y)
 	SelectObject(hdc, Platform_Inner_Pen);
 	SelectObject(hdc, Platform_Inner_Brush);
 	RoundRect(hdc, x+9, y+18, x + (Inner_Width + 31), y+Global_Scale*2, 10 * Global_Scale, 32 * Global_Scale);
-						//x+ Inner_Width Расстояние между шариками, может увеличиваться!!!
+						//x + Inner_Width Расстояние между шариками, может увеличиваться!!!
 
 	// 3. Рисуем среднюю часть
 	SelectObject(hdc, Arc_Pen);
@@ -120,8 +177,14 @@ void Draw_Platform(HDC hdc, int x, int y)
 void Draw_Frame(HDC hdc)
 //	Отрисовка экрана игры
 {
-	Draw_Level(hdc);
+	/*Draw_Level(hdc);
 
-	Draw_Platform(hdc, 350, 550);
+	Draw_Platform(hdc, 350, 550);*/
+
+	int i;
+	for (i = 0; i < 16; i++)
+	{
+		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 200, i);
+	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
