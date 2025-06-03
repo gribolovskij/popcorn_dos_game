@@ -2,6 +2,14 @@
 #define _USE_MATH_DEFINES
 #include "math.h"
 
+
+enum ELetter_Type
+{
+	ELT_None,
+
+	ELT_O,
+};
+
 enum Ebrick_Type
 {
 	EBT_None,
@@ -9,7 +17,7 @@ enum Ebrick_Type
 	EBT_Blue,
 };
 
-HPEN Purple_Brick_Pen, Blue_Brick_Pen, Platform_Circle_Pen, Platform_Inner_Pen, Arc_Pen;
+HPEN Letter_Pen, Purple_Brick_Pen, Blue_Brick_Pen, Platform_Circle_Pen, Platform_Inner_Pen, Arc_Pen;
 HBRUSH Purple_Brick_Brush, Blue_Brick_Brush, Platform_Circle_Brush, Platform_Inner_Brush, Arc_Brush;
 
 const int Global_Scale = 1;
@@ -21,6 +29,7 @@ const int Level_X_Offset = 23;
 const int Level_Y_Offset = 13;
 const int Circle_Size = 20;
 const int Volume_Rectangle = 59;
+const int Y_Letter = 8;
 
 int Inner_Width = 40;
 
@@ -51,6 +60,7 @@ void Create_Pen_Brush(unsigned  char r, unsigned  char g, unsigned  char b, HPEN
 void Init()
 //	Функция инициализации |=|=|=| Настройка игры при старте
 {
+	Letter_Pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
 	Create_Pen_Brush(112, 146, 190, Blue_Brick_Pen, Blue_Brick_Brush);
 	Create_Pen_Brush(255, 182, 89, Purple_Brick_Pen, Purple_Brick_Brush);
 	Create_Pen_Brush(155, 0, 0, Platform_Circle_Pen, Platform_Circle_Brush);
@@ -111,7 +121,7 @@ void Set_Brick_Letter_Colors(bool is_switch_color, HPEN &front_pen, HBRUSH &fron
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void Draw_Brick_Letter(HDC hdc, int x, int y, Ebrick_Type brick_type, int rotation_step)
+void Draw_Brick_Letter(HDC hdc, int x, int y, Ebrick_Type brick_type, ELetter_Type letter_type,int rotation_step)
 //	Отрисовка падающего кирпича с буквой
 {
 	bool switch_color;
@@ -134,6 +144,7 @@ void Draw_Brick_Letter(HDC hdc, int x, int y, Ebrick_Type brick_type, int rotati
 		rotation_angle = 2.0 * M_PI / 16 * (double)rotation_step;				// Отложенная инициализация
 	else
 		rotation_angle = 2.0 * M_PI / 16 * (double)(8L - (long long)rotation_step);
+
 	if (rotation_step > 4 && rotation_step <= 12)
 	{
 		if (brick_type == EBT_Blue)
@@ -193,8 +204,14 @@ Set_Brick_Letter_Colors(switch_color, front_pen, front_brush, back_pen, back_bru
 
 		Rectangle(hdc, 0, brick_half_height_foreground, Volume_Rectangle, -brick_half_height_foreground);
 
-		SelectObject(hdc, back_pen);
-		Ellipse(hdc, 25 * 2, 25 , 6 * 2, 25 * 2);
+		if (rotation_step > 4 && rotation_step <= 12)
+		{
+			if (letter_type == ELT_O)
+			{
+				SelectObject(hdc, Letter_Pen);
+				Ellipse(hdc, Circle_Size, -Y_Letter, Circle_Size * 2, Y_Letter);
+			}
+		}
 
 		SetWorldTransform(hdc, &old_xForm);
 	}
@@ -240,8 +257,8 @@ void Draw_Frame(HDC hdc)
 	int i;
 	for (i = 0; i < 16; i++)
 	{
-		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 200, EBT_Blue, i);
-		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 130, EBT_Purple, i);
+		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 200, EBT_Blue, ELT_O ,i);
+		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 130, EBT_Purple, ELT_O,  i);
 
 	}
 }
