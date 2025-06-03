@@ -17,8 +17,9 @@ enum Ebrick_Type
 	EBT_Blue,
 };
 
-HPEN Letter_Pen, Purple_Brick_Pen, Blue_Brick_Pen, Platform_Circle_Pen, Platform_Inner_Pen, Arc_Pen;
-HBRUSH Purple_Brick_Brush, Blue_Brick_Brush, Platform_Circle_Brush, Platform_Inner_Brush, Arc_Brush;
+HWND Hwnd;
+HPEN Letter_Pen, Purple_Brick_Pen, Blue_Brick_Pen, Platform_Circle_Pen, Platform_Inner_Pen, Arc_Pen, BG_Pen;
+HBRUSH Purple_Brick_Brush, Blue_Brick_Brush, Platform_Circle_Brush, Platform_Inner_Brush, Arc_Brush, BG_Brush;
 
 const int Global_Scale = 1;
 const int Brick_Width = 61;
@@ -30,8 +31,15 @@ const int Level_Y_Offset = 13;
 const int Circle_Size = 20;
 const int Volume_Rectangle = 59;
 const int Y_Letter = 8;
+const int Platform_Y_Pos = 550;
+const int Platform_Height = 25;
 
+int Platform_X_Pos = 0;
+int Platform_X_Step = 10;
+int Platform_Width = 115;
 int Inner_Width = 40;
+
+RECT Platform_Rect, Prev_Platform_Rect;
 
 char Level_01[14][12] =
 {
@@ -57,15 +65,33 @@ void Create_Pen_Brush(unsigned  char r, unsigned  char g, unsigned  char b, HPEN
 	brush = CreateSolidBrush(RGB(r, g, b));
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void Init()
+void Redraw_Platform()
+{	
+	Prev_Platform_Rect = Platform_Rect;
+
+	Platform_Rect.left = Platform_X_Pos * Global_Scale;
+	Platform_Rect.top = Platform_Y_Pos * Global_Scale;
+	Platform_Rect.right = Platform_Rect.left + Platform_Width; 
+	Platform_Rect.bottom = Platform_Rect.top + Platform_Height;
+
+	InvalidateRect(Hwnd, &Prev_Platform_Rect, FALSE);
+	InvalidateRect(Hwnd, &Platform_Rect, FALSE);
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void Init_Engine(HWND hwnd)
 //	Функция инициализации |=|=|=| Настройка игры при старте
 {
+	Hwnd = hwnd;
+
+	Create_Pen_Brush(3, 105, 24, BG_Pen, BG_Brush);
+
 	Letter_Pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
 	Create_Pen_Brush(112, 146, 190, Blue_Brick_Pen, Blue_Brick_Brush);
 	Create_Pen_Brush(255, 182, 89, Purple_Brick_Pen, Purple_Brick_Brush);
 	Create_Pen_Brush(155, 0, 0, Platform_Circle_Pen, Platform_Circle_Brush);
 	Create_Pen_Brush(249, 100, 0, Platform_Inner_Pen, Platform_Inner_Brush);
 	Create_Pen_Brush(255, 255, 255, Arc_Pen, Arc_Brush);
+	Redraw_Platform();
 	}
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
@@ -230,6 +256,11 @@ void Draw_Level(HDC hdc)
 void Draw_Platform(HDC hdc, int x, int y)
 //	Рисуем платформу
 {
+	// Чистим экран при перемещение платформы
+	SelectObject(hdc, BG_Pen);
+	SelectObject(hdc, BG_Brush);
+	Rectangle(hdc, Prev_Platform_Rect.left, Prev_Platform_Rect.right, Prev_Platform_Rect.top, Prev_Platform_Rect.bottom);
+
 	// 1. Рисуем боковые шарики
 	SelectObject(hdc, Platform_Circle_Pen);
 	SelectObject(hdc, Platform_Circle_Brush);
@@ -244,23 +275,46 @@ void Draw_Platform(HDC hdc, int x, int y)
 
 	// 3. Рисуем среднюю часть
 	SelectObject(hdc, Arc_Pen);
-	Arc	(hdc, 363, 563, 353, 552, 360, 489, 179, 489 );
+	Arc	(hdc, x+13, y+13, x+3, y+2, x+10, 489, 179, 489 );
+	// highlight need correct!
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Frame(HDC hdc)
 //	Отрисовка экрана игры
 {
-	/*Draw_Level(hdc);
+	Draw_Level(hdc);
 
-	Draw_Platform(hdc, 350, 550);*/
+	Draw_Platform(hdc, Platform_X_Pos, Platform_Y_Pos);
 
-	int i;
-	for (i = 0; i < 16; i++)
-	{
-		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 200, EBT_Blue, ELT_O ,i);
-		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 130, EBT_Purple, ELT_O,  i);
+	//int i;
+	//for (i = 0; i < 16; i++)
+	//{
+	//	Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 200, EBT_Blue, ELT_O ,i);
+	//	Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 130, EBT_Purple, ELT_O,  i);
 
-	}
+	
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-////
+int On_Key_Down(EKey_Type key_type)
+{
+
+	switch (key_type)
+	{
+	case EKT_Left:
+		Platform_X_Pos -= Platform_X_Step;
+		Redraw_Platform();
+		break;
+
+	case EKT_Right:
+		Platform_X_Pos += Platform_X_Step;
+		Redraw_Platform();
+		break;
+
+	case EKT_Space:
+
+		break;
+	}
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
