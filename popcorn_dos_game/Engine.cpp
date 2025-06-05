@@ -33,15 +33,21 @@ const int Volume_Rectangle = 59;
 const int Y_Letter = 8;
 const int Platform_Y_Pos = 550;
 const int Platform_Height = 25;
+const int Platform_X_Step = 10;
+
+const int Level_Width = 14;		// Width brick
+const int Level_Height = 12;	// Height brick
+
 
 int Platform_X_Pos = 0;
-int Platform_X_Step = 10;
+
 int Platform_Width = 115;
 int Inner_Width = 40;
 
 RECT Platform_Rect, Prev_Platform_Rect;
+RECT Level_Rect;
 
-char Level_01[14][12] =
+char Level_01[Level_Width][Level_Height] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -69,10 +75,10 @@ void Redraw_Platform()
 {	
 	Prev_Platform_Rect = Platform_Rect;
 
-	Platform_Rect.left = Platform_X_Pos * Global_Scale;
-	Platform_Rect.top = Platform_Y_Pos * Global_Scale;
-	Platform_Rect.right = Platform_Rect.left + Platform_Width; 
-	Platform_Rect.bottom = Platform_Rect.top + Platform_Height;
+	Platform_Rect.left = Level_X_Offset + Platform_X_Pos;
+	Platform_Rect.top = Platform_Y_Pos;
+	Platform_Rect.right = Platform_Rect.left + Platform_Width;
+	Platform_Rect.bottom = Platform_Rect.top + Platform_Height;		// Смеющийся Игрик?!?
 
 	InvalidateRect(Hwnd, &Prev_Platform_Rect, FALSE);
 	InvalidateRect(Hwnd, &Platform_Rect, FALSE);
@@ -91,6 +97,12 @@ void Init_Engine(HWND hwnd)
 	Create_Pen_Brush(155, 0, 0, Platform_Circle_Pen, Platform_Circle_Brush);
 	Create_Pen_Brush(249, 100, 0, Platform_Inner_Pen, Platform_Inner_Brush);
 	Create_Pen_Brush(255, 255, 255, Arc_Pen, Arc_Brush);
+
+	Level_Rect.left = Level_X_Offset;
+	Level_Rect.top = Level_Y_Offset ;
+	Level_Rect.right = Level_Rect.left + Cell_Width * Level_Width;
+	Level_Rect.bottom = Level_Rect.top + Cell_Height * Level_Height;
+
 	Redraw_Platform();
 	}
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -216,19 +228,19 @@ Set_Brick_Letter_Colors(switch_color, front_pen, front_brush, back_pen, back_bru
 		GetWorldTransform(hdc, &old_xForm);
 		SetWorldTransform(hdc, &xForm);
 
-	 //	Выводим фон
+	 //	Deduced background
 		SelectObject(hdc, back_pen);
 		SelectObject(hdc, back_brush);
 
 		offset = (1.0 - fabs(xForm.eM22)) * 12;
 		back_part_offset = (int)round(offset);
-		Rectangle(hdc, 0, -brick_half_height - back_part_offset, Volume_Rectangle, brick_half_height - back_part_offset);
+		RoundRect(hdc, 0, -brick_half_height - back_part_offset, Volume_Rectangle, brick_half_height - back_part_offset, 10, 32);
 
-	// Выводим передний план
+	// Deduced foreground
 		SelectObject(hdc, front_pen);
 		SelectObject(hdc, front_brush);
 
-		Rectangle(hdc, 0, brick_half_height_foreground, Volume_Rectangle, -brick_half_height_foreground);
+		RoundRect(hdc, 0, brick_half_height_foreground, Volume_Rectangle, -brick_half_height_foreground, 10, 32);
 
 		if (rotation_step > 4 && rotation_step <= 12)
 		{
@@ -244,7 +256,7 @@ Set_Brick_Letter_Colors(switch_color, front_pen, front_brush, back_pen, back_bru
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Level(HDC hdc)
-//	Вывод всех кирпичей уровня
+//	Drawing all bricks level
 {
 	int i,j;
 
@@ -254,50 +266,52 @@ void Draw_Level(HDC hdc)
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Platform(HDC hdc, int x, int y)
-//	Рисуем платформу
+//	Drawing platform
 {
-	// Чистим экран при перемещение платформы
+	// Cleen the window, when moving the platform
 	SelectObject(hdc, BG_Pen);
 	SelectObject(hdc, BG_Brush);
-	Rectangle(hdc, Prev_Platform_Rect.left, Prev_Platform_Rect.right, Prev_Platform_Rect.top, Prev_Platform_Rect.bottom);
+	Rectangle(hdc, Prev_Platform_Rect.left, Prev_Platform_Rect.top, Prev_Platform_Rect.right, Prev_Platform_Rect.bottom);
 
-	// 1. Рисуем боковые шарики
+	// 1. Drawing lateral circles
 	SelectObject(hdc, Platform_Circle_Pen);
 	SelectObject(hdc, Platform_Circle_Brush);
 	Ellipse(hdc, x, y, x + Circle_Size* Global_Scale, y + Circle_Size * Global_Scale);
 	Ellipse(hdc, x + (Circle_Size+Inner_Width), y, x + ((Circle_Size*2)+Inner_Width), y+ Circle_Size);
 
-	// 2. Рисуем среднюю часть
+	// 2. Drawing inner part
 	SelectObject(hdc, Platform_Inner_Pen);
 	SelectObject(hdc, Platform_Inner_Brush);
 	RoundRect(hdc, x+9, y+18, x + (Inner_Width + 31), y+Global_Scale*2, 10 * Global_Scale, 32 * Global_Scale);
-						//x + Inner_Width Расстояние между шариками, может увеличиваться!!!
-
-	// 3. Рисуем среднюю часть
+						
+	// 3. Drawing highlight
 	SelectObject(hdc, Arc_Pen);
-	Arc	(hdc, x+13, y+13, x+3, y+2, x+10, 489, 179, 489 );
-	// highlight need correct!
+	Arc	(hdc, x+13, y+13, x+3, y+2, x+10, y - 61, x - 121, y - 61 );
+	//	good arc!! very good nice!!!
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void Draw_Frame(HDC hdc)
-//	Отрисовка экрана игры
+void Draw_Frame(HDC hdc, RECT &paint_area)
+//	Drawing screen game
 {
+	RECT intersection_rect;
+
+	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect) );
 	Draw_Level(hdc);
 
-	Draw_Platform(hdc, Platform_X_Pos, Platform_Y_Pos);
+	if (IntersectRect(&intersection_rect, &paint_area, &Platform_Rect) );
+	Draw_Platform(hdc, Level_X_Offset + Platform_X_Pos, Platform_Y_Pos);
 
-	//int i;
-	//for (i = 0; i < 16; i++)
-	//{
-	//	Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 200, EBT_Blue, ELT_O ,i);
-	//	Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 130, EBT_Purple, ELT_O,  i);
-
-	
+	/*int i;
+	for (i = 0; i < 16; i++)
+	{
+		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 200, EBT_Blue, ELT_O, i);
+		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 130, EBT_Purple, ELT_O, i);
+	}*/
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int On_Key_Down(EKey_Type key_type)
 {
-
+	// Platform movement from pressing WINDOW_Keys_Virtual
 	switch (key_type)
 	{
 	case EKT_Left:
