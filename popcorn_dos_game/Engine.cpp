@@ -18,8 +18,8 @@ enum Ebrick_Type
 };
 
 HWND Hwnd;
-HPEN Letter_Pen, Purple_Brick_Pen, Blue_Brick_Pen, Platform_Circle_Pen, Platform_Inner_Pen, Arc_Pen, BG_Pen;
-HBRUSH Purple_Brick_Brush, Blue_Brick_Brush, Platform_Circle_Brush, Platform_Inner_Brush, Arc_Brush, BG_Brush;
+HPEN Letter_Pen, Purple_Brick_Pen, Blue_Brick_Pen, Platform_Circle_Pen, Platform_Inner_Pen, Arc_Pen, BG_Pen, Ball_Pen;
+HBRUSH Purple_Brick_Brush, Blue_Brick_Brush, Platform_Circle_Brush, Platform_Inner_Brush, Arc_Brush, BG_Brush, Ball_Brush;
 
 const int Global_Scale = 1;
 const int Brick_Width = 61;
@@ -33,19 +33,21 @@ const int Volume_Rectangle = 59;
 const int Y_Letter = 8;
 const int Platform_Y_Pos = 550;
 const int Platform_Height = 25;
-const int Platform_X_Step = 10;
-
+const int Platform_X_Step = 20;
 const int Level_Width = 14;		// Width brick
 const int Level_Height = 12;	// Height brick
-
+const int Ball_Size = 18;
 
 int Platform_X_Pos = 0;
-
 int Platform_Width = 115;
 int Inner_Width = 40;
 
+int Ball_X_Pos = 64, Ball_Y_Pos = 500;
+
+
 RECT Platform_Rect, Prev_Platform_Rect;
 RECT Level_Rect;
+RECT Ball_Rect;
 
 char Level_01[Level_Width][Level_Height] =
 {
@@ -97,6 +99,7 @@ void Init_Engine(HWND hwnd)
 	Create_Pen_Brush(155, 0, 0, Platform_Circle_Pen, Platform_Circle_Brush);
 	Create_Pen_Brush(249, 100, 0, Platform_Inner_Pen, Platform_Inner_Brush);
 	Create_Pen_Brush(255, 255, 255, Arc_Pen, Arc_Brush);
+	Create_Pen_Brush(255, 0, 0, Ball_Pen, Ball_Brush);
 
 	Level_Rect.left = Level_X_Offset;
 	Level_Rect.top = Level_Y_Offset ;
@@ -104,6 +107,9 @@ void Init_Engine(HWND hwnd)
 	Level_Rect.bottom = Level_Rect.top + Cell_Height * Level_Height;
 
 	Redraw_Platform();
+
+	SetTimer(Hwnd, Timer_ID, 50, 0);
+
 	}
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
@@ -290,6 +296,22 @@ void Draw_Platform(HDC hdc, int x, int y)
 	//	good arc!! very good nice!!!
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void Draw_Ball(HDC hdc, RECT &paint_area)
+{
+
+	int x = Level_X_Offset + Ball_X_Pos;
+	int y = Level_Y_Offset + Ball_Y_Pos; 
+
+	Ball_Rect.left = Level_X_Offset + Ball_X_Pos;
+	Ball_Rect.top = Level_Y_Offset + Ball_Y_Pos;
+	Ball_Rect.right = Ball_Rect.left + Ball_Size;
+	Ball_Rect.bottom = Ball_Rect.top + Ball_Size;
+
+	SelectObject(hdc, Ball_Pen);
+	SelectObject(hdc, Ball_Brush);
+	Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right - 1, Ball_Rect.bottom - 1);
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Draw_Frame(HDC hdc, RECT &paint_area)
 //	Drawing screen game
 {
@@ -307,6 +329,8 @@ void Draw_Frame(HDC hdc, RECT &paint_area)
 		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 200, EBT_Blue, ELT_O, i);
 		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 130, EBT_Purple, ELT_O, i);
 	}*/
+	//if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect) );
+	Draw_Ball(hdc, paint_area);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int On_Key_Down(EKey_Type key_type)
@@ -328,7 +352,11 @@ int On_Key_Down(EKey_Type key_type)
 
 		break;
 	}
-
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+int On_Timer()
+{
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
