@@ -431,17 +431,17 @@ void Move_Ball()
 	next_y_pos = Ball_Y_Pos - (int)(Ball_Speed * sin(Ball_Direction) );
 
 	//	1. Correction position when reflecting
-	if (next_x_pos < 0)
+	if (next_x_pos < Border_X_Offset)
 	{
-		next_x_pos = -next_x_pos;
+		next_x_pos = Level_X_Offset - (next_x_pos - Level_X_Offset);
 		Ball_Direction = M_PI - Ball_Direction;
 	}
-	if (next_y_pos < Level_Y_Offset)
+	if (next_y_pos < Border_Y_Offset)
 	{
 		next_y_pos = Level_Y_Offset - (next_y_pos - Level_Y_Offset);
 		Ball_Direction = -Ball_Direction;
 	}
-	if (next_x_pos > Max_X_Pos)
+	if (next_x_pos > Max_X_Pos - Ball_Size)
 	{
 		next_x_pos = Max_X_Pos - (next_x_pos - Max_X_Pos);
 		Ball_Direction = M_PI - Ball_Direction;
@@ -454,8 +454,8 @@ void Move_Ball()
 	//	2. Move the ball
 	Ball_X_Pos = next_x_pos;
 	Ball_Y_Pos = next_y_pos;
-	Ball_Rect.left = Level_X_Offset + Ball_X_Pos;
-	Ball_Rect.top = Level_Y_Offset + Ball_Y_Pos;
+	Ball_Rect.left = Ball_X_Pos;
+	Ball_Rect.top = Ball_Y_Pos;
 	Ball_Rect.right = Ball_Rect.left + Ball_Size;
 	Ball_Rect.bottom = Ball_Rect.top + Ball_Size;
 
