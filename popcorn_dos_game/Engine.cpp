@@ -36,12 +36,12 @@ const int Platform_Height = 25;
 const int Platform_X_Step = 20;
 const int Level_Width = 12;		// Width brick
 const int Level_Height = 14;	// Height brick
-const int Ball_Size = 18;
+const int Ball_Size = 14;
 const int Max_X_Pos = (Level_X_Offset + Cell_Width * Level_Width);
-const int Max_Y_Pos = 632 - Ball_Size;
+const int Max_Y_Pos = 632;
 
 const int Border_X_Offset = 22;
-const int Border_Y_Offset = 67;
+const int Border_Y_Offset = 17;
 
 int Platform_X_Pos = Border_X_Offset;
 int Platform_Width = 115;
@@ -51,7 +51,8 @@ int Ball_X_Pos = 64, Ball_Y_Pos = 500;
 
 //	Speed ball
 int Ball_X_Offset = 3, Ball_Y_Offset = -3;
-double Ball_Speed = 4.0, Ball_Direction = M_PI - M_PI_4;				//M_PI_4 = 45 градусов
+double Ball_Speed = 9.0, 
+Ball_Direction = M_PI - M_PI_4;				//M_PI_4 = 45 градусов
 
 RECT Platform_Rect, Prev_Platform_Rect;
 RECT Level_Rect;
@@ -421,36 +422,77 @@ int On_Key_Down(EKey_Type key_type)
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void Check_Hit_Brick(int &next_y_pos)
+{
+	// Correction position when reflecting from the bricks
+	int i;
+	int j;
+	int brick_y_pos = Level_Y_Offset + Level_Height * Cell_Height;
+
+	for (i = Level_Height - 1; i >= 0; i--)
+	{
+		for (j = 0; j < Level_Width; j++)
+		{
+			if (Level_01[i][j] == 0)
+				continue;
+
+			if (next_y_pos < brick_y_pos)
+			{
+				next_y_pos = brick_y_pos - (next_y_pos - brick_y_pos);	// bricks
+				Ball_Direction = -Ball_Direction;
+			}
+		}
+		brick_y_pos -= Cell_Height;
+	}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void Move_Ball()
 {
 	int next_x_pos, next_y_pos;
+	int max_x_pos = Max_X_Pos - Ball_Size;
+	int platform_y_pos = Platform_Y_Pos - Ball_Size;
 
 	Prev_Ball_Rect = Ball_Rect;
 
 	next_x_pos = Ball_X_Pos + (int)(Ball_Speed * cos(Ball_Direction) );
 	next_y_pos = Ball_Y_Pos - (int)(Ball_Speed * sin(Ball_Direction) );
 
-	//	1. Correction position when reflecting
+	//	1. Correction position when reflecting from the frame
 	if (next_x_pos < Border_X_Offset)
 	{
-		next_x_pos = Level_X_Offset - (next_x_pos - Level_X_Offset);
+		next_x_pos = Level_X_Offset - (next_x_pos - Level_X_Offset);	//left
 		Ball_Direction = M_PI - Ball_Direction;
 	}
 	if (next_y_pos < Border_Y_Offset)
 	{
-		next_y_pos = Level_Y_Offset - (next_y_pos - Level_Y_Offset);
-		Ball_Direction = -Ball_Direction;
+		next_y_pos = Border_Y_Offset - (next_y_pos - Border_Y_Offset);	//top
+		Ball_Direction = - Ball_Direction;
 	}
-	if (next_x_pos > Max_X_Pos - Ball_Size)
+	if (next_x_pos > max_x_pos)
 	{
-		next_x_pos = Max_X_Pos - (next_x_pos - Max_X_Pos);
+		next_x_pos = max_x_pos - (next_x_pos - max_x_pos);				//right
 		Ball_Direction = M_PI - Ball_Direction;
 	}
 	if (next_y_pos > Max_Y_Pos)
 	{
-		next_x_pos = Max_X_Pos - (next_x_pos - Max_X_Pos);
+		next_x_pos = Max_X_Pos - (next_x_pos - Max_X_Pos);				//bottom
 		Ball_Direction = M_PI_2 - Ball_Direction;
 	}
+
+	
+	// Correction position when reflecting from the platform
+	if (next_y_pos > platform_y_pos)
+	{
+		if (next_x_pos >= Platform_X_Pos && next_x_pos <= Platform_X_Pos + Platform_Width)
+		{
+			next_y_pos = platform_y_pos - (next_y_pos - platform_y_pos);
+			Ball_Direction = M_PI + (M_PI - Ball_Direction);
+		}
+	}
+
+	// Correction position when reflecting from the bricks
+	Check_Hit_Brick(next_y_pos);
+
 	//	2. Move the ball
 	Ball_X_Pos = next_x_pos;
 	Ball_Y_Pos = next_y_pos;
