@@ -51,7 +51,7 @@ int Ball_X_Pos = 64, Ball_Y_Pos = 500;
 
 //	Speed ball
 int Ball_X_Offset = 3, Ball_Y_Offset = -3;
-double Ball_Speed = 9.0, 
+double Ball_Speed = 6.0, 
 Ball_Direction = M_PI - M_PI_4;				//M_PI_4 = 45 градусов
 
 RECT Platform_Rect, Prev_Platform_Rect;
