@@ -20,9 +20,27 @@ char Level_01[ALevel::Level_Height][ALevel::Level_Width] =
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 // CLASS ALEVEL
-
+// 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Check_Hit_Brick(int &next_y_pos)
+void ALevel::Init_Level()
+{
+	RECT intersection_rect;
+
+	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
+		return;
+
+	AsEngine::Create_Pen_Brush(112, 146, 190, Blue_Brick_Pen, Blue_Brick_Brush);
+	AsEngine::Create_Pen_Brush(255, 182, 89, Purple_Brick_Pen, Purple_Brick_Brush);
+	Letter_Pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+
+	Level_Rect.left = Level_X_Offset;
+	Level_Rect.top = Level_Y_Offset;
+	Level_Rect.right = Level_Rect.left + Cell_Width * Level_Width;
+	Level_Rect.bottom = Level_Rect.top + Cell_Height * Level_Height;
+
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ALevel::Check_Level_Hit_Brick(int &next_y_pos, double &ball_direction)
 {
 	// Correction position when reflecting from the bricks
 	int i;
@@ -39,7 +57,7 @@ void ALevel::Check_Hit_Brick(int &next_y_pos)
 			if (next_y_pos < brick_y_pos)
 			{
 				next_y_pos = brick_y_pos - (next_y_pos - brick_y_pos);	// bricks
-				Ball_Direction = -Ball_Direction;
+				ball_direction = -ball_direction;
 			}
 		}
 		brick_y_pos -= Cell_Height;
@@ -277,7 +295,7 @@ void ABall::Move(AsEngine *engine, ALevel *level)
 	}
 
 	// Correction position when reflecting from the bricks
-	level->Check_Hit_Brick(next_y_pos);
+	level->Check_Level_Hit_Brick(next_y_pos, Ball_Direction);
 
 	//	2. Move the ball
 	Ball_X_Pos = next_x_pos;
@@ -294,23 +312,6 @@ void ABall::Move(AsEngine *engine, ALevel *level)
 
 																			// CLASS ASENGINE
 
-void ALevel::Init_Level()
-{
-	RECT intersection_rect;
-
-	if (! IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
-		return;
-
-	AsEngine::Create_Pen_Brush(112, 146, 190, Blue_Brick_Pen, Blue_Brick_Brush);
-	AsEngine::Create_Pen_Brush(255, 182, 89, Purple_Brick_Pen, Purple_Brick_Brush);
-	Letter_Pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
-
-	Level_Rect.left = Level_X_Offset;
-	Level_Rect.top = Level_Y_Offset;
-	Level_Rect.right = Level_Rect.left + Cell_Width * Level_Width;
-	Level_Rect.bottom = Level_Rect.top + Cell_Height * Level_Height;
-
-}
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AsEngine::AsEngine()
 
