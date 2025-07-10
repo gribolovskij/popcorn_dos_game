@@ -104,7 +104,7 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    if (hWnd == 0) 
 	   return FALSE;
   
-   Engine.Init_Engine(hWnd);																			// Функция инициализации
+   Engine.Init(hWnd);																			// Функция инициализации
 
    ShowWindow(hWnd, nCmdShow);
    UpdateWindow(hWnd);

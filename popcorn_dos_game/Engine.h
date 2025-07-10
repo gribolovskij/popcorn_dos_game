@@ -30,9 +30,9 @@ const int Timer_ID = WM_USER + 1;
 class ALevel
 {
 public:
+	void Init();
 	void Check_Level_Hit_Brick(int &next_y_pos, double &ball_direction);
-	void Init_Level();
-	void Draw_Level(HDC hdc);
+	void Draw(HDC hdc);
 
 	static const int Level_Height = 14;		// Height brick
 	static const int Level_Width = 12;		// Width brick
@@ -59,13 +59,15 @@ private:
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class AsEngine;
+class AsPlatform;
 class ABall
 {
 public:
 	ABall();
 
+	void Init();
 	void Draw(HDC hdc, RECT& paint_area, AsEngine *engine);
-	void Move(AsEngine *engine, ALevel *level);
+	void Move(AsEngine *engine, ALevel *level, AsPlatform *platform);
 
 
 	double Ball_Direction;
@@ -83,55 +85,72 @@ private:
 
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class ALevel;
-class AsEngine
+class AsPlatform
 {
 public:
-	AsEngine();
-	
-	ABall Ball;
-	ALevel level;
+	AsPlatform();
 
-	void Init_Engine(HWND hwnd);
+	void Init();
+	void Redraw_Platform(AsEngine *engine);
+	void Draw(HDC hdc, AsEngine *engine, RECT& paint_area);
+
+	int X_Pos;
+	int Width;
+
+	static const int Circle_Size = 20;
+	static const int Y_Pos = 550;
+	static const int X_Step = 20;
+
+private:
+	int Inner_Width;
+
+	RECT Platform_Rect, Prev_Platform_Rect;
+
+	HPEN Platform_Circle_Pen, Platform_Inner_Pen, Arc_Pen;
+	HBRUSH Platform_Circle_Brush, Platform_Inner_Brush, Arc_Brush;
+
+	static const int Height = 25;
+};
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class AsBorder
+{
+public:
+	void Init();
+	void Draw(HDC hdc, RECT& paint_area, AsEngine *engine);
+
+	static const int X_Offset = 22;
+	static const int Y_Offset = 17;
+
+private:
+	void Draw_Element(HDC hdc, int x, int y, bool top_border, AsEngine *engine);
+
+	HPEN Border_Blue_Pen, Border_White_Pen;
+	HBRUSH Border_Blue_Brush, Border_White_Brush;
+};
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class AsEngine
+
+{
+public:
+	ABall Ball;
+	ALevel Level;
+	AsPlatform Platform;
+	AsBorder Border;
+
+	void Init(HWND hwnd);
 	void Draw_Frame(HDC hdc, RECT& paint_area);
 	int On_Key_Down(EKey_Type key_type);
 	int On_Timer();
 	static void Create_Pen_Brush(unsigned  char r, unsigned  char g, unsigned  char b, HPEN& pen, HBRUSH& brush);
 
-	int Platform_X_Pos;
-	int Platform_Width;
-
 	HWND Hwnd;
 	HPEN BG_Pen;
 	HBRUSH BG_Brush;
 
-
 	static const int Max_X_Pos = (ALevel::Level_X_Offset + ALevel::Cell_Width * ALevel::Level_Width);
 	static const int Max_Y_Pos = 632;
-	static const int Platform_Y_Pos = 550;
-	static const int Border_X_Offset = 22;
-	static const int Border_Y_Offset = 17;
 	static const int Global_Scale = 1;
 	static const int Volume_Rectangle = 59;
 	static const int Y_Letter = 8;
-	static const int Circle_Size = 20;
-
-private:
-	void Redraw_Platform();
-	void Draw_Platform(HDC hdc, int x, int y);
-	void Draw_Border(HDC hdc, int x, int y, bool top_border);
-	void Draw_Bounce(HDC hdc, RECT& paint_area);
-
-	HPEN Platform_Circle_Pen, Platform_Inner_Pen, Arc_Pen,  Border_Blue_Pen, Border_White_Pen;
-	HBRUSH Platform_Circle_Brush, Platform_Inner_Brush, Arc_Brush,  Border_Blue_Brush, Border_White_Brush;
-
-	int Platform_Inner_Width;
-
-	RECT Platform_Rect, Prev_Platform_Rect;
-	
-	
-	
-	static const int Platform_Height = 25;
-	static const int Platform_X_Step = 20;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
