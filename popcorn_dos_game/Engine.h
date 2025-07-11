@@ -112,22 +112,6 @@ private:
 	static const int Height = 25;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class AsBorder
-{
-public:
-	void Init();
-	void Draw(HDC hdc, RECT& paint_area, AsEngine *engine);
-
-	static const int X_Offset = 22;
-	static const int Y_Offset = 17;
-
-private:
-	void Draw_Element(HDC hdc, int x, int y, bool top_border, AsEngine *engine);
-
-	HPEN Border_Blue_Pen, Border_White_Pen;
-	HBRUSH Border_Blue_Brush, Border_White_Brush;
-};
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class AsEngine
 
 {
@@ -135,7 +119,6 @@ public:
 	ABall Ball;
 	ALevel Level;
 	AsPlatform Platform;
-	AsBorder Border;
 
 	void Init(HWND hwnd);
 	void Draw_Frame(HDC hdc, RECT& paint_area);
