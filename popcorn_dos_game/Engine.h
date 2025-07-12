@@ -3,6 +3,7 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 #include <Windows.h>
+#include "Border.h"
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 enum Ebrick_Type
 {
@@ -119,6 +120,7 @@ public:
 	ABall Ball;
 	ALevel Level;
 	AsPlatform Platform;
+	AsBorder Border;
 
 	void Init(HWND hwnd);
 	void Draw_Frame(HDC hdc, RECT& paint_area);

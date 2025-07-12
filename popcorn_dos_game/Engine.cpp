@@ -425,7 +425,7 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 	}*/
 	Ball.Draw(hdc, paint_area, this);
 
-	Border.Draw(hdc, paint_area, this);
+	Border.Draw(hdc, paint_area, BG_Pen, BG_Brush);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Key_Down(EKey_Type key_type)
