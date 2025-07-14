@@ -1,10 +1,10 @@
-#include "Engine.h"
+#include "Border.h"
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsBorder::Init()
 {
-	AsEngine::Create_Pen_Brush(108, 251, 247, Border_Blue_Pen, Border_Blue_Brush);
-	AsEngine::Create_Pen_Brush(255, 255, 255, Border_White_Pen, Border_White_Brush);
+	AsConfig::Create_Pen_Brush(108, 251, 247, Border_Blue_Pen, Border_Blue_Brush);
+	AsConfig::Create_Pen_Brush(255, 255, 255, Border_White_Pen, Border_White_Brush);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border, HPEN &bg_pen, HBRUSH &bg_brush)

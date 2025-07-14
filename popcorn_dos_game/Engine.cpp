@@ -29,8 +29,8 @@ void ALevel::Init()
 	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
 		return;
 
-	AsEngine::Create_Pen_Brush(112, 146, 190, Blue_Brick_Pen, Blue_Brick_Brush);
-	AsEngine::Create_Pen_Brush(255, 182, 89, Purple_Brick_Pen, Purple_Brick_Brush);
+	AsConfig::Create_Pen_Brush(112, 146, 190, Blue_Brick_Pen, Blue_Brick_Brush);
+	AsConfig::Create_Pen_Brush(255, 182, 89, Purple_Brick_Pen, Purple_Brick_Brush);
 
 	Letter_Pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
 
@@ -234,13 +234,13 @@ void ALevel::Draw(HDC hdc)
 // CLASS ABALL
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ABall::ABall()
-	: Ball_X_Pos(64), Ball_Y_Pos(500), Ball_X_Offset(3), Ball_Y_Offset(-3), Ball_Speed(6), Ball_Direction(M_PI - M_PI_4)
+	: Ball_X_Pos(64), Ball_Y_Pos(500), Ball_X_Offset(3), Ball_Y_Offset(-3), Ball_Speed(6), Ball_Direction(M_PI - M_PI_4), Ball_Brush(0), Ball_Rect{}, Prev_Ball_Rect{}, Ball_Pen(0)
 {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABall::Init()
 {
-	AsEngine::Create_Pen_Brush(255, 0, 0, Ball_Pen, Ball_Brush);
+	AsConfig::Create_Pen_Brush(255, 0, 0, Ball_Pen, Ball_Brush);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABall::Draw(HDC hdc, RECT &paint_area, AsEngine *engine)
@@ -328,15 +328,15 @@ void ABall::Move(AsEngine *engine, ALevel *level, AsPlatform *platform)
 // AsPlatform
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-	: X_Pos(AsBorder::X_Offset), Width(115), Inner_Width(40)
+	: X_Pos(AsBorder::X_Offset), Width(115), Inner_Width(40), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}
 {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Init()
 {
-	AsEngine::Create_Pen_Brush(155, 0, 0, Platform_Circle_Pen, Platform_Circle_Brush);
-	AsEngine::Create_Pen_Brush(249, 100, 0, Platform_Inner_Pen, Platform_Inner_Brush);
-	AsEngine::Create_Pen_Brush(255, 255, 255, Arc_Pen, Arc_Brush);
+	AsConfig::Create_Pen_Brush(155, 0, 0, Platform_Circle_Pen, Platform_Circle_Brush);
+	AsConfig::Create_Pen_Brush(249, 100, 0, Platform_Inner_Pen, Platform_Inner_Brush);
+	AsConfig::Create_Pen_Brush(255, 255, 255, Arc_Pen, Arc_Brush);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Redraw_Platform(AsEngine *engine)
@@ -398,7 +398,7 @@ void AsEngine::Init(HWND hwnd)
 {
 	Hwnd = hwnd;
 
-	Create_Pen_Brush(3, 105, 24, BG_Pen, BG_Brush);
+	AsConfig::Create_Pen_Brush(3, 105, 24, BG_Pen, BG_Brush);
 
 	Level.Init();
 	Ball.Init();
@@ -463,7 +463,7 @@ int AsEngine::On_Timer()
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void AsEngine::Create_Pen_Brush(unsigned  char r, unsigned  char g, unsigned  char b, HPEN &pen, HBRUSH &brush)
+void AsConfig::Create_Pen_Brush(unsigned  char r, unsigned  char g, unsigned  char b, HPEN &pen, HBRUSH &brush)
 {// Функция реализации цвета RGB одной строкой //	Function to implement RGB color in one line
 	pen = CreatePen(PS_SOLID, 0, RGB(r, g, b));
 	brush = CreateSolidBrush(RGB(r, g, b));
