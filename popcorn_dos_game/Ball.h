@@ -1,17 +1,31 @@
 #pragma once
 
 #include "Config.h"
+#include "Level.h"
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class AsBorder
+class ABall
 {
 public:
+	ABall();
+
 	void Init();
 	void Draw(HDC hdc, RECT& paint_area, HPEN &bg_pen, HBRUSH &bg_brush);
-	void Draw_Element(HDC hdc, int x, int y, bool top_border, HPEN &bg_pen, HBRUSH &bg_brush );
+	void Move(HWND Hwnd, ALevel *level, int platform_x_pos, int platform_width);
+
+
+	double Ball_Direction;
+
+	HPEN Ball_Pen;
+	HBRUSH Ball_Brush; 
+	RECT Ball_Rect, Prev_Ball_Rect;
 
 private:
-	HPEN Border_Blue_Pen, Border_White_Pen;
-	HBRUSH Border_Blue_Brush, Border_White_Brush;
+	int Ball_X_Pos, Ball_Y_Pos;
+	int Ball_X_Offset, Ball_Y_Offset;
+	double Ball_Speed;
+
+	static const int Ball_Size = 14;
+
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

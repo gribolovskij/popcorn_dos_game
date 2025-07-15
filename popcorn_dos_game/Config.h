@@ -2,6 +2,9 @@
 
 #include <Windows.h>
 
+#define _USE_MATH_DEFINES
+#include <math.h>
+
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class AsConfig
 {
@@ -12,5 +15,16 @@ public:
 	static const int Circle_Size = 20;
 	static const int Volume_Rectangle = 59;
 	static const int Y_Letter = 8;
+	static const int Max_Y_Pos = 632;
+	static const int Level_Height = 14;		// Height brick
+	static const int Level_Width = 12;		// Width brick
+	static const int Level_X_Offset = 23;		// Position start level
+	static const int Level_Y_Offset = 13;		// Position start level
+	static const int Cell_Width = 64;
+	static const int Cell_Height = 26;
+	static const int Max_X_Pos = (Level_X_Offset + Cell_Width * Level_Width);
+	static const int X_Offset = 22;
+	static const int Y_Offset = 17;
+	static const int Y_Pos = 550;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

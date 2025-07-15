@@ -3,9 +3,6 @@
 
 #include "Config.h"
 
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 enum Ebrick_Type
 {
@@ -17,7 +14,6 @@ enum Ebrick_Type
 enum ELetter_Type
 {
 	ELT_None,
-
 	ELT_O,
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -29,13 +25,6 @@ public:
 	void Init();
 	void Check_Level_Hit_Brick(int &next_y_pos, double &ball_direction);
 	void Draw(HDC hdc);
-
-	static const int Level_Height = 14;		// Height brick
-	static const int Level_Width = 12;		// Width brick
-	static const int Level_X_Offset = 23;		// Position start level
-	static const int Level_Y_Offset = 13;		// Position start level
-	static const int Cell_Width = 64;
-	static const int Cell_Height = 26;
 
 	RECT Level_Rect;
 
