@@ -4,44 +4,37 @@
 #define MAX_LOADSTRING 100
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-// Global Variables:							// Глобальные переменные:
-AsEngine Engine;															
-HINSTANCE hInst;                                // current instance              Текущий экземпляр
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text            Текст заголовка
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name    Имя класса главного окна 
+// Global Variables:
+AsEngine Engine;
+HINSTANCE hInst;                                // current instance              
+WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text            
+WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name    
 
-// Forward declarations of functions included in this code module:               Предварительные объявления функций, включенных в этот модуль кода:
-ATOM                MyRegisterClass(HINSTANCE hInstance);   
-BOOL                InitInstance(HINSTANCE, int);
-LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
-INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+// Forward declarations of functions included in this code module:               
+ATOM MyRegisterClass(HINSTANCE hInstance);
+BOOL InitInstance(HINSTANCE, int);
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK About(HWND, UINT, WPARAM, LPARAM);
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-					 _In_opt_ HINSTANCE hPrevInstance,
-					 _In_ LPWSTR    lpCmdLine,
-					 _In_ int       nCmdShow)
+int APIENTRY wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-
-	// TODO: Place code here.          TODO: Разместить код здесь.
-
-	// Initialize global strings            Инициализация глобальных строк
+	// TODO: Place code here.
+	// Initialize global strings
 	LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
 	LoadStringW(hInstance, IDC_POPCORNDOSGAME, szWindowClass, MAX_LOADSTRING);
 	MyRegisterClass(hInstance);
 
-	// Perform application initialization:   Выполняем инициализацию приложения:
-	if (!InitInstance (hInstance, nCmdShow))
-	{
+	// Perform application initialization:
+	if (!InitInstance(hInstance, nCmdShow))
 		return FALSE;
-	}
 
 	HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_POPCORNDOSGAME));
 
 	MSG msg;
 
-	// Main message loop:    Основной цикл сообщений:
+	// Main message loop:
 	while (GetMessage(&msg, nullptr, 0, 0))
 	{
 		if (!TranslateAccelerator(msg.hwnd, hAccelTable, &msg))
@@ -50,66 +43,61 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			DispatchMessage(&msg);
 		}
 	}
-
-	return (int) msg.wParam;
+	return (int)msg.wParam;
 }
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//  FUNCTION: MyRegisterClass()              ФУНКЦИЯ: MyRegisterClass()
-//  PURPOSE: Registers the window class.     НАЗНАЧЕНИЕ: Регистрирует класс окна.
+//  FUNCTION: MyRegisterClass()
+//  PURPOSE: Registers the window class.
 ATOM MyRegisterClass(HINSTANCE hInstance)
 {
-   WNDCLASSEXW wcex;
+	WNDCLASSEXW wcex;
 
-   wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.cbSize = sizeof(WNDCLASSEX);
+	wcex.style = CS_HREDRAW | CS_VREDRAW;
+	wcex.lpfnWndProc = WndProc;
+	wcex.cbClsExtra = 0;
+	wcex.cbWndExtra = 0;
+	wcex.hInstance = hInstance;
+	wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_POPCORNDOSGAME));
+	wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+	wcex.hbrBackground = CreateSolidBrush(RGB(3, 105, 24));								//(HBRUSH)(COLOR_WINDOW + 1);
+	wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_POPCORNDOSGAME);
+	wcex.lpszClassName = szWindowClass;
+	wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
 
-   wcex.style = CS_HREDRAW | CS_VREDRAW;
-   wcex.lpfnWndProc = WndProc;
-   wcex.cbClsExtra = 0;
-   wcex.cbWndExtra = 0;
-   wcex.hInstance = hInstance;
-   wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_POPCORNDOSGAME));
-   wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
-   wcex.hbrBackground = CreateSolidBrush(RGB(3, 105, 24));								//(HBRUSH)(COLOR_WINDOW + 1);
-   wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_POPCORNDOSGAME);
-   wcex.lpszClassName = szWindowClass;
-   wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
-  
-   return RegisterClassExW(&wcex);
+	return RegisterClassExW(&wcex);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-//   FUNCTION: InitInstance(HINSTANCE, int)                                         ФУНКЦИЯ: InitInstance(HINSTANCE, int)
-//   PURPOSE: Saves instance handle and creates main window                         НАЗНАЧЕНИЕ: Сохраняет дескриптор экземпляра и создает главное окно
+//   FUNCTION: InitInstance(HINSTANCE, int)
+//   PURPOSE: Saves instance handle and creates main window
 // 
-//   In this function, we save the instance handle in a global variable and         В этой функции мы сохраняем дескриптор экземпляра в глобальной переменной и
-//   create and display the main program window.                                    создаем и отображаем главное окно программы.
-
+//   In this function, we save the instance handle in a global variable and
+//   create and display the main program window.
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // Store instance handle in our global variable				Сохраняем дескриптор экземпляра в нашей глобальной переменной
+	hInst = hInstance; // Store instance handle in our global variable
 
+	RECT window_rect;													
+	window_rect.left = 0;
+	window_rect.top = 0;
+	window_rect.right = 1265;
+	window_rect.bottom = 633;
 
-   RECT window_rect;																// Создаем пользовательский размер окна для разных систем, где меню игры может различаться
-   window_rect.left = 0;
-   window_rect.top = 0;
-   window_rect.right = 1265;
-   window_rect.bottom = 633;
+	AdjustWindowRect(&window_rect, WS_OVERLAPPEDWINDOW, TRUE);
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------	
+	HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW,
+		0, 0, window_rect.right - window_rect.left, window_rect.bottom - window_rect.top, nullptr, nullptr, hInstance, nullptr);
 
-   AdjustWindowRect(&window_rect, WS_OVERLAPPEDWINDOW, TRUE);
+	if (hWnd == 0)
+		return FALSE;
 
-   //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-   HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_OVERLAPPEDWINDOW, 
-	   0, 0, window_rect.right-window_rect.left, window_rect.bottom-window_rect.top, nullptr, nullptr, hInstance, nullptr);
+	Engine.Init(hWnd);																			// Функция инициализации
 
-   if (hWnd == 0) 
-	   return FALSE;
-  
-   Engine.Init(hWnd);																			// Функция инициализации
+	ShowWindow(hWnd, nCmdShow);
+	UpdateWindow(hWnd);
 
-   ShowWindow(hWnd, nCmdShow);
-   UpdateWindow(hWnd);
-
-   return TRUE;
+	return TRUE;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)									ФУНКЦИЯ: WndProc(HWND, UINT, WPARAM, LPARAM)
@@ -119,40 +107,37 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 //  WM_DESTROY  - post a quit message and return									WM_DESTRUCTION - отправка сообщения о выходе и возврат
 LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
+	int wmId;
+	HDC hdc;
+
 	switch (message)
 	{
 	case WM_COMMAND:
+		wmId = LOWORD(wParam);
+		// Parse the menu selections:							 Анализируем пункты меню:
+		switch (wmId)
 		{
-			int wmId = LOWORD(wParam);
-			// Parse the menu selections:							 Анализируем пункты меню:
-			switch (wmId)
-			{
-			case IDM_ABOUT:
-				DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
-				break;
+		case IDM_ABOUT:
+			DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+			break;
 
+		case IDM_EXIT:
+			DestroyWindow(hWnd);
+			break;
 
-			case IDM_EXIT:
-				DestroyWindow(hWnd);
-				break;
-
-				default:
-				return DefWindowProc(hWnd, message, wParam, lParam);
-			}
+		default:
+			return DefWindowProc(hWnd, message, wParam, lParam);
 		}
-		break;
-
+	break;
 
 	case WM_PAINT:
-		{
-			PAINTSTRUCT ps;
-			HDC hdc = BeginPaint(hWnd, &ps);
-			// TODO: Add any drawing code that uses hdc here...	 TODO: Добавьте сюда любой код рисования, использующий hdc...
-			Engine.Draw_Frame(hdc, ps.rcPaint);
-			EndPaint(hWnd, &ps);
-		}
+	
+		PAINTSTRUCT ps;
+		hdc = BeginPaint(hWnd, &ps);
+		// TODO: Add any drawing code that uses hdc here...	 TODO: Добавьте сюда любой код рисования, использующий hdc...
+		Engine.Draw_Frame(hdc, ps.rcPaint);
+		EndPaint(hWnd, &ps);
 		break;
-
 
 	case WM_DESTROY:
 		PostQuitMessage(0);
@@ -163,19 +148,19 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 		{
 		case VK_LEFT:
 			return Engine.On_Key_Down(EKT_Left);
-			
+
 		case VK_RIGHT:
 			return Engine.On_Key_Down(EKT_Right);
-			
+
 		case VK_SPACE:
 			return Engine.On_Key_Down(EKT_Space);
 		}
 		break;
 
 	case WM_TIMER:
-				if (wParam == Timer_ID)
-				return Engine.On_Timer();
-				break;
+		if (wParam == Timer_ID)
+			return Engine.On_Timer();
+		break;
 
 	default:
 		return DefWindowProc(hWnd, message, wParam, lParam);
@@ -199,8 +184,6 @@ INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 			return (INT_PTR)TRUE;
 		}
 		break;
-
-
 	}
 	return (INT_PTR)FALSE;
 }

@@ -2,7 +2,7 @@
 
 // ALevel
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-char Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
+Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -40,7 +40,7 @@ void ALevel::Init()
 
 	Level_Rect.left = AsConfig::Level_X_Offset;
 	Level_Rect.top = AsConfig::Level_Y_Offset;
-	Level_Rect.right = Level_Rect.left +AsConfig::Cell_Width * AsConfig::Level_Width;
+	Level_Rect.right = Level_Rect.left + AsConfig::Cell_Width * AsConfig::Level_Width;
 	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height;
 
 }
@@ -73,6 +73,7 @@ void ALevel::Draw(HDC hdc)
 //	Drawing all bricks level
 {
 	RECT intersection_rect;
+	RECT brick_rect;
 
 	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
 		return;
@@ -82,6 +83,16 @@ void ALevel::Draw(HDC hdc)
 	for (i = 0; i < AsConfig::Level_Height; i++)
 		for (j = 0; j< AsConfig::Level_Width; j++)
 			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (Ebrick_Type)Level_01[i][j]);
+
+	brick_rect.left = 
+	brick_rect.top = 
+	brick_rect.right = 
+	brick_rect.bottom = 
+
+	SelectObject(hdc, pen);
+	SelectObject(hdc, brush);
+	RoundRect(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, Brick_Width + x * AsConfig::Global_Scale, Brick_Height + y * AsConfig::Global_Scale, 10*AsConfig::Global_Scale, 32*AsConfig::Global_Scale);	
+
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)

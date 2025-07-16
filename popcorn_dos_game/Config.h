@@ -25,6 +25,6 @@ public:
 	static const int Max_X_Pos = (Level_X_Offset + Cell_Width * Level_Width);
 	static const int X_Offset = 22;
 	static const int Y_Offset = 17;
-	static const int Y_Pos = 550;
+	static const int Platform_Y_Pos = 550;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

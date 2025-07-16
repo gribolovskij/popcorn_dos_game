@@ -20,7 +20,7 @@ void AsPlatform::Redraw_Platform(HWND Hwnd)
 	Prev_Platform_Rect = Platform_Rect;
 
 	Platform_Rect.left = X_Pos;
-	Platform_Rect.top = AsConfig::Y_Pos;
+	Platform_Rect.top = AsConfig::Platform_Y_Pos;
 	Platform_Rect.right = Platform_Rect.left + Width;
 	Platform_Rect.bottom = Platform_Rect.top + Height;
 
@@ -32,7 +32,7 @@ void AsPlatform::Draw(HDC hdc, HPEN &bg_pen, HBRUSH &bg_brush, RECT& paint_area)
 //	Drawing platform
 {
 	int x = X_Pos;
-	int y = AsConfig::Y_Pos;
+	int y = AsConfig::Platform_Y_Pos;
 
 	RECT intersection_rect;
 

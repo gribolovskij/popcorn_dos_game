@@ -13,7 +13,6 @@ public:
 	void Draw(HDC hdc, RECT& paint_area, HPEN &bg_pen, HBRUSH &bg_brush);
 	void Move(HWND Hwnd, ALevel *level, int platform_x_pos, int platform_width);
 
-
 	double Ball_Direction;
 
 	HPEN Ball_Pen;
@@ -26,6 +25,5 @@ private:
 	double Ball_Speed;
 
 	static const int Ball_Size = 14;
-
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

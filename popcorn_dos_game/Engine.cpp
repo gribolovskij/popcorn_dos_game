@@ -1,6 +1,10 @@
 ﻿#include "Engine.h"
 
 // AsEngine
+AsEngine::AsEngine()
+	: 	Hwnd{}, BG_Pen(0), BG_Brush(0)
+{
+}
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsEngine::Init(HWND hwnd)
 //	Initialization function |=|=|=| Setting up the game at startup
