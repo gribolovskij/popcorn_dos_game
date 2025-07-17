@@ -38,6 +38,6 @@ private:
 
 	static const int Brick_Width = 61;
 	static const int Brick_Height = 23;
-	static const char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
+	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

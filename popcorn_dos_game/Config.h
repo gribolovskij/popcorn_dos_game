@@ -26,5 +26,6 @@ public:
 	static const int X_Offset = 22;
 	static const int Y_Offset = 17;
 	static const int Platform_Y_Pos = 550;
+	static const int Fault_Variable = 39;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

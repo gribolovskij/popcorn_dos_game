@@ -1,8 +1,8 @@
 #include "Level.h"
-
+#include "Config.h"
 // ALevel
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
+char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 {
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
@@ -70,10 +70,12 @@ void ALevel::Check_Level_Hit_Brick(int &next_y_pos, double &ball_direction)
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Draw(HDC hdc)
-//	Drawing all bricks level
 {
 	RECT intersection_rect;
 	RECT brick_rect;
+	
+	HPEN pen;
+	HBRUSH brush;
 
 	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
 		return;
@@ -84,14 +86,18 @@ void ALevel::Draw(HDC hdc)
 		for (j = 0; j< AsConfig::Level_Width; j++)
 			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (Ebrick_Type)Level_01[i][j]);
 
-	brick_rect.left = 
-	brick_rect.top = 
-	brick_rect.right = 
-	brick_rect.bottom = 
+
+
+	AsConfig::Create_Pen_Brush(112, 146, 190, pen, brush);
+
+	brick_rect.left = Brick_Height;
+	brick_rect.top = AsConfig::Fault_Variable ;
+	brick_rect.bottom = brick_rect.top + Brick_Height;
+	brick_rect.right = brick_rect.left + Brick_Width;
 
 	SelectObject(hdc, pen);
 	SelectObject(hdc, brush);
-	RoundRect(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, Brick_Width + x * AsConfig::Global_Scale, Brick_Height + y * AsConfig::Global_Scale, 10*AsConfig::Global_Scale, 32*AsConfig::Global_Scale);	
+	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right, brick_rect.bottom, 10*AsConfig::Global_Scale, 32*AsConfig::Global_Scale);	
 
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
