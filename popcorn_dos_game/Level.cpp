@@ -24,7 +24,6 @@ ALevel::ALevel()
 	: Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}
 {
 }
-
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Init()
 {
@@ -69,13 +68,9 @@ void ALevel::Check_Level_Hit_Brick(int &next_y_pos, double &ball_direction)
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Draw(HDC hdc)
+void ALevel::Draw(HDC hdc, HWND Hwnd)
 {
 	RECT intersection_rect;
-	RECT brick_rect;
-	
-	HPEN pen;
-	HBRUSH brush;
 
 	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
 		return;
@@ -86,19 +81,7 @@ void ALevel::Draw(HDC hdc)
 		for (j = 0; j< AsConfig::Level_Width; j++)
 			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (Ebrick_Type)Level_01[i][j]);
 
-
-
-	AsConfig::Create_Pen_Brush(112, 146, 190, pen, brush);
-
-	brick_rect.left = Brick_Height;
-	brick_rect.top = AsConfig::Fault_Variable ;
-	brick_rect.bottom = brick_rect.top + Brick_Height;
-	brick_rect.right = brick_rect.left + Brick_Width;
-
-	SelectObject(hdc, pen);
-	SelectObject(hdc, brush);
-	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right, brick_rect.bottom, 10*AsConfig::Global_Scale, 32*AsConfig::Global_Scale);	
-
+	Action_Brick.Draw(hdc);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
@@ -127,7 +110,7 @@ void ALevel::Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
 	}
 	SelectObject(hdc, pen);
 	SelectObject(hdc, brush);
-	RoundRect(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, Brick_Width + x * AsConfig::Global_Scale, Brick_Height + y * AsConfig::Global_Scale, 10*AsConfig::Global_Scale, 32*AsConfig::Global_Scale);	
+	RoundRect(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, AsConfig::Brick_Width + x * AsConfig::Global_Scale, AsConfig::Brick_Height + y * AsConfig::Global_Scale, 10*AsConfig::Global_Scale, 32*AsConfig::Global_Scale);
 
 	// Brick - paint
 }
@@ -158,7 +141,7 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, Ebrick_Type brick_type, EL
 	bool switch_color;
 	double offset;
 	double rotation_angle;		// Converting step to rotation angle
-	int brick_half_height = (Brick_Height / 2);
+	int brick_half_height = (AsConfig::Brick_Height / 2);
 	int brick_half_height_foreground = (AsConfig::Circle_Size / 2);
 	int back_part_offset;
 	HPEN front_pen, back_pen;

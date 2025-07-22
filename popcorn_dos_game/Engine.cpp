@@ -20,25 +20,22 @@ void AsEngine::Init(HWND hwnd)
 
 	Platform.Redraw_Platform(Hwnd);
 
-	SetTimer(Hwnd, Timer_ID, 1, 0);
+	SetTimer(Hwnd, Timer_ID, 1000/AsConfig::FPS, 0);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 //	Drawing screen game
 {
-		Level.Draw(hdc);
-
+	Level.Draw(hdc, Hwnd);
 	Platform.Draw(hdc, BG_Pen, BG_Brush, paint_area);
-
+	Ball.Draw(hdc, paint_area, BG_Pen, BG_Brush);
+	Border.Draw(hdc, paint_area, BG_Pen, BG_Brush);
 	/*int i;
 	for (i = 0; i < 16; i++)
 	{
 		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 200, EBT_Blue, ELT_O, i);
 		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 130, EBT_Purple, ELT_O, i);
 	}*/
-	Ball.Draw(hdc, paint_area, BG_Pen, BG_Brush);
-
-	Border.Draw(hdc, paint_area, BG_Pen, BG_Brush);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Key_Down(EKey_Type key_type)
@@ -72,6 +69,8 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 int AsEngine::On_Timer()
 {
 	Ball.Move(Hwnd, &Level, Platform.X_Pos, Platform.Width);
+
+	Level.Action_Brick.Act(Hwnd);
 
 	return 0;
 }

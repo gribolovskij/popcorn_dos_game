@@ -20,6 +20,8 @@ public:
 	static const int Level_Width = 12;		// Width brick
 	static const int Level_X_Offset = 23;		// Position start level
 	static const int Level_Y_Offset = 13;		// Position start level
+	static const int Brick_Width = 61;
+	static const int Brick_Height = 23; 
 	static const int Cell_Width = 64;
 	static const int Cell_Height = 26;
 	static const int Max_X_Pos = (Level_X_Offset + Cell_Width * Level_Width);
@@ -27,5 +29,6 @@ public:
 	static const int Y_Offset = 17;
 	static const int Platform_Y_Pos = 550;
 	static const int Fault_Variable = 39;
+	static const int FPS = 60;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
