@@ -2,7 +2,7 @@
 
 // AsEngine
 AsEngine::AsEngine()
-	: 	Hwnd{}, BG_Pen(0), BG_Brush(0)
+	: 	Hwnd{}
 {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ void AsEngine::Init(HWND hwnd)
 {
 	Hwnd = hwnd;
 
-	AsConfig::Create_Pen_Brush(3, 105, 24, BG_Pen, BG_Brush);
+	AAction_Brick::Setup_Colors();
 
 	Level.Init();
 	Ball.Init();
@@ -27,9 +27,9 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 //	Drawing screen game
 {
 	Level.Draw(hdc, Hwnd);
-	Platform.Draw(hdc, BG_Pen, BG_Brush, paint_area);
-	Ball.Draw(hdc, paint_area, BG_Pen, BG_Brush);
-	Border.Draw(hdc, paint_area, BG_Pen, BG_Brush);
+	Platform.Draw(hdc, paint_area);
+	Ball.Draw(hdc, paint_area);
+	Border.Draw(hdc, paint_area);
 	/*int i;
 	for (i = 0; i < 16; i++)
 	{

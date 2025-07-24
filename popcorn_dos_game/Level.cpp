@@ -21,9 +21,10 @@ char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALevel::ALevel()
-	: Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}
+	: Action_Brick(EBT_Purple), Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}
+
 {
-}
+} 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Init()
 {
@@ -32,8 +33,8 @@ void ALevel::Init()
 	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
 		return;
 
-	AsConfig::Create_Pen_Brush(112, 146, 190, Blue_Brick_Pen, Blue_Brick_Brush);
-	AsConfig::Create_Pen_Brush(255, 182, 89, Purple_Brick_Pen, Purple_Brick_Brush);
+	AsConfig::Create_Pen_Brush(AsConfig::Gray_Brick_Color, Blue_Brick_Pen, Blue_Brick_Brush);
+	AsConfig::Create_Pen_Brush(AsConfig::Orange_Brick_Color, Purple_Brick_Pen, Purple_Brick_Brush);
 
 	Letter_Pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
 

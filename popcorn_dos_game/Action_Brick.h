@@ -2,20 +2,37 @@
 
 #include "Config.h"
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+enum Ebrick_Type
+{
+	EBT_None,
+	EBT_Purple,
+	EBT_Blue,
+};
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class AAction_Brick
 {
 public:
-	AAction_Brick();
+	AAction_Brick(Ebrick_Type brick_Type);
 	void Draw(HDC hdc);
 	void Act(HWND Hwnd);
+	static void Setup_Colors();
 
-	int Fade_Step;
+private:
+	Ebrick_Type brick_Type;
 
 	RECT brick_rect;
-
 	HPEN pen;
 	HBRUSH brush;
 
-	static const int Fade_Brick = 60;
+	int Fade_Brick;
+	static unsigned char Get_Fading_Channel_Color(unsigned char color, unsigned char bg_color, int step);
+	static void Get_Fading_Color(const AColor &color, int step, HPEN &pen, HBRUSH &brush);
+
+	static const int Fade_Brick_Step = 80;
+
+	static HPEN Fading_Blue_Brick_Pens[Fade_Brick_Step];
+	static HBRUSH Fading_Blue_Brick_Brushes[Fade_Brick_Step];
+	static HPEN Fading_Purple_Brick_Pens[Fade_Brick_Step];
+	static HBRUSH Fading_Purple_Brick_Brushes[Fade_Brick_Step];
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

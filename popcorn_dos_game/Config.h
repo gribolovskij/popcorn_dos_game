@@ -5,11 +5,33 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+//AColor
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class AColor
+{
+public:
+	AColor(unsigned  char r, unsigned  char g, unsigned  char b);
+	
+	unsigned char R, G, B;
+
+
+};
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+// AsConfig
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class AsConfig
 {
 public: 
+	static void Setup_Colors();
 	static void Create_Pen_Brush(unsigned  char r, unsigned  char g, unsigned  char b, HPEN& pen, HBRUSH& brush);
+	static void Create_Pen_Brush(const AColor &color, HPEN& pen, HBRUSH& brush);
+
+	static const AColor Gray_Brick_Color, Orange_Brick_Color, BG_Color;
+
+	static HPEN BG_Pen;
+	static HBRUSH BG_Brush;
 
 	static const int Global_Scale = 1;
 	static const int Circle_Size = 20;
@@ -29,6 +51,6 @@ public:
 	static const int Y_Offset = 17;
 	static const int Platform_Y_Pos = 550;
 	static const int Fault_Variable = 39;
-	static const int FPS = 60;
+	static const int FPS = 40;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
