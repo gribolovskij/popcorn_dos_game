@@ -3,6 +3,13 @@
 #include "Config.h"
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+enum EPlatform_State
+{
+	EPS_Missing,
+	EPS_Normal,
+	EPS_Meltdown
+};
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class AsEngine;
 class AsPlatform
 {
@@ -10,6 +17,7 @@ public:
 	AsPlatform();
 
 	void Init();
+	void Act(HWND Hwnd);
 	void Redraw_Platform(HWND Hwnd);
 	void Draw(HDC hdc, RECT& paint_area);
 
@@ -20,6 +28,10 @@ public:
 	static const int X_Step = 20;
 
 private:
+	void Draw_Meltdown_State(HDC hdc, RECT& paint_area);
+	void Draw_Normal_State(HDC hdc, RECT& paint_area);
+
+	EPlatform_State Platform_State;
 
 	RECT Platform_Rect, Prev_Platform_Rect;
 

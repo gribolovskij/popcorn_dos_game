@@ -4,7 +4,7 @@
 // AsPlatform
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-	: X_Pos(AsConfig::X_Offset), Width(115), Inner_Width(40), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}
+	: X_Pos(AsConfig::X_Offset), Width(115), Inner_Width(40), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), Platform_State(EPS_Meltdown), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}
 {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -13,6 +13,15 @@ void AsPlatform::Init()
 	AsConfig::Create_Pen_Brush(155, 0, 0, Platform_Circle_Pen, Platform_Circle_Brush);
 	AsConfig::Create_Pen_Brush(249, 100, 0, Platform_Inner_Pen, Platform_Inner_Brush);
 	AsConfig::Create_Pen_Brush(255, 255, 255, Arc_Pen, Arc_Brush);
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AsPlatform::Act(HWND Hwnd)
+{
+	Platform_State = EPS_Meltdown;
+
+	if (Platform_State == EPS_Meltdown)
+		Redraw_Platform(Hwnd);
+
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Redraw_Platform(HWND Hwnd)
@@ -29,7 +38,13 @@ void AsPlatform::Redraw_Platform(HWND Hwnd)
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw(HDC hdc, RECT& paint_area)
-//	Drawing platform
+//	Drawing platform for normal state
+{
+	AsPlatform::Draw_Normal_State(hdc, paint_area);
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AsPlatform::Draw_Normal_State(HDC hdc, RECT& paint_area)
+//	Drawing platform for normal state
 {
 	int x = X_Pos;
 	int y = AsConfig::Platform_Y_Pos;
@@ -61,8 +76,32 @@ void AsPlatform::Draw(HDC hdc, RECT& paint_area)
 	//	good arc!! very good nice!!!
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
+//	Drawing platform for meltdown state
+{
+	int i, j;
+	int y_offset;
+	int x, y;
 
+	int area_width, area_height;
 
+	area_width = Width * AsConfig::Global_Scale;
 
+	area_height = Height * AsConfig::Global_Scale;
 
+	for (i = 0; i < area_width; i++)
+	{
+		y_offset = 1;
 
+		x = Platform_Rect.left + i;
+
+		for (i = 0; j < area_height; j++)
+		{
+			y = Platform_Rect.bottom - j;
+
+			pixel = Get_Pixel(x, y);
+			Set_Pixel(x, y + y_offset, pixel);
+		}
+	}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
