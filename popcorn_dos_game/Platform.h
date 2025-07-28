@@ -20,11 +20,15 @@ public:
 	void Act(HWND Hwnd);
 	void Redraw_Platform(HWND Hwnd);
 	void Draw(HDC hdc, RECT& paint_area);
+	static int Rand(int range);
 
 	int X_Pos;
 	int Width;
 	int Inner_Width;
-	int Meltdown_Y_Pos;
+	static const int Width_Normal = 115;
+
+	int Meltdown_Platform_Y_Pos[Width_Normal];
+
 
 	static const int X_Step = 20;
 
@@ -40,5 +44,6 @@ private:
 	HBRUSH Platform_Circle_Brush, Platform_Inner_Brush, Arc_Brush;
 
 	static const int Height = 25;
+	static const int Meltdown_Speed = 3;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

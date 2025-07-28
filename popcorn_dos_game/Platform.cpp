@@ -4,8 +4,8 @@
 // AsPlatform
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-	: X_Pos(AsConfig::X_Offset), Width(115), Inner_Width(40), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), Platform_State(EPS_Normal), 
-	  Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Y_Pos(0)
+	: X_Pos(AsConfig::X_Offset), Width(Width_Normal), Inner_Width(40), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), Platform_State(EPS_Normal), 
+	Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Platform_Y_Pos{}
 {
 	X_Pos = (AsConfig::Max_X_Pos - Width) / 2;
 }
@@ -19,10 +19,19 @@ void AsPlatform::Init()
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Act(HWND Hwnd)
 {
+	int i, len;
+
 	if (Platform_State != EPS_Meltdown)
 	{
 		Platform_State = EPS_Meltdown;	
-		Meltdown_Y_Pos = Platform_Rect.bottom;
+
+		len = sizeof(Meltdown_Platform_Y_Pos) / sizeof(Meltdown_Platform_Y_Pos[0]);
+
+		for (i = 0; i < len; i++)
+		{
+			Meltdown_Platform_Y_Pos[i] = Platform_Rect.bottom;
+		}
+		
 	}
 	
 	if (Platform_State == EPS_Meltdown)
@@ -39,7 +48,7 @@ void AsPlatform::Redraw_Platform(HWND Hwnd)
 	Platform_Rect.bottom = Platform_Rect.top + Height;
 
 	if (Platform_State == EPS_Meltdown)
-		Prev_Platform_Rect.bottom = AsConfig::Max_Y_Pos * AsConfig::Global_Scale;
+		Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 1);
 
 	InvalidateRect(Hwnd, &Prev_Platform_Rect, FALSE);
 	InvalidateRect(Hwnd, &Platform_Rect, FALSE);
@@ -95,27 +104,29 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT& paint_area)
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 //	Drawing platform for meltdown state
-{
-	int i, j;
+{	int i, j;
 	int y_offset;
 	int x, y;
-
-	COLORREF pixel, bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
-
 	int area_width, area_height;
 
 	area_width = Width * AsConfig::Global_Scale;
-
 	area_height = Height * AsConfig::Global_Scale + 1;
+
+	COLORREF pixel, bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
+	RECT intersection_rect;
+
+	// EXAMINATION
+	if (!IntersectRect(&intersection_rect, &paint_area, &Platform_Rect))
+		return;
 
 	for (i = 0; i < area_width; i++)
 	{
-		y_offset = 2;
+		y_offset = AsConfig::Rand(Meltdown_Speed) + 2;
 		x = Platform_Rect.left + i;
 
 		for (j = 0; j < area_height; j++)
 		{
-			y = Meltdown_Y_Pos - j;
+			y = Meltdown_Platform_Y_Pos[i] - j;
 
 			pixel = GetPixel(hdc, x, y);
 			SetPixel(hdc, x, y + y_offset, pixel);
@@ -123,10 +134,10 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 
 		for (j = 0; j < y_offset; j++)
 		{
-			y = Meltdown_Y_Pos - area_height + 1 + j;
+			y = Meltdown_Platform_Y_Pos[i] - area_height + 1 + j;
 			SetPixel(hdc, x, y, bg_pixel);
 		}
+		Meltdown_Platform_Y_Pos[i] += y_offset;
 	}
-	Meltdown_Y_Pos += 2;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -27,15 +27,17 @@ public:
 	static void Setup_Colors();
 	static void Create_Pen_Brush(unsigned  char r, unsigned  char g, unsigned  char b, HPEN& pen, HBRUSH& brush);
 	static void Create_Pen_Brush(const AColor &color, HPEN& pen, HBRUSH& brush);
+	static int Rand(int range);
+
+	static int 	Tick_Current_Timer;
 
 	static const AColor Gray_Brick_Color, Orange_Brick_Color, BG_Color;
-
 	static HPEN BG_Pen;
 	static HBRUSH BG_Brush;
 
 	static const int Global_Scale = 1;
 	static const int Circle_Size = 20;
-	static const int Volume_Rectangle = 59;
+	static const int Volume_Rectangle = 59; 
 	static const int Y_Letter = 8;
 	static const int Level_Height = 14;		// Height brick
 	static const int Level_Width = 12;		// Width brick
