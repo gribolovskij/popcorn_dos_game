@@ -24,6 +24,7 @@ public:
 	int X_Pos;
 	int Width;
 	int Inner_Width;
+	int Meltdown_Y_Pos;
 
 	static const int X_Step = 20;
 
