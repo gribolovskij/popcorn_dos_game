@@ -36,6 +36,7 @@ void ABall::Move(HWND Hwnd, ALevel *level, int platform_x_pos, int platform_widt
 	int next_x_pos, next_y_pos;
 	int max_x_pos = AsConfig::Max_X_Pos - Ball_Size;
 	int platform_y_pos = AsConfig::Platform_Y_Pos - Ball_Size;
+	int max_y_pos = AsConfig::Max_Y_Pos - Ball_Size;	
 
 	Prev_Ball_Rect = Ball_Rect;
 
@@ -58,10 +59,10 @@ void ABall::Move(HWND Hwnd, ALevel *level, int platform_x_pos, int platform_widt
 		next_x_pos = max_x_pos - (next_x_pos - max_x_pos);				//right
 		Ball_Direction = M_PI - Ball_Direction;
 	}
-	if (next_y_pos > AsConfig::Max_Y_Pos)
+	if (next_y_pos > max_y_pos)
 	{
-		next_x_pos = AsConfig::Max_X_Pos - (next_x_pos - AsConfig::Max_X_Pos);				//bottom
-		Ball_Direction = M_PI_2 - Ball_Direction;
+		next_y_pos = max_y_pos - (next_y_pos - max_y_pos);				//bottom
+		Ball_Direction = M_PI + (M_PI - Ball_Direction);
 	}
 
 	// Correction position when reflecting from the platform
@@ -70,7 +71,7 @@ void ABall::Move(HWND Hwnd, ALevel *level, int platform_x_pos, int platform_widt
 		if (next_x_pos >= platform_x_pos && next_x_pos <= platform_x_pos + platform_width)
 		{
 			next_y_pos = platform_y_pos - (next_y_pos - platform_y_pos);
-			Ball_Direction = M_PI + (M_PI - Ball_Direction);
+			Ball_Direction = -Ball_Direction;
 		}
 	}
 

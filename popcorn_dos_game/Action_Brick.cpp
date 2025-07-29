@@ -62,7 +62,7 @@ void AAction_Brick::Setup_Colors()
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 unsigned char AAction_Brick::Get_Fading_Channel_Color(unsigned char color, unsigned char bg_color, int step)
 {
-	return color - step * (color - bg_color) / Fade_Brick_Step - 1;
+	return color - step * (color - bg_color) / (Fade_Brick_Step - 1);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AAction_Brick::Get_Fading_Color(const AColor &color, int step, HPEN &pen, HBRUSH &brush)
