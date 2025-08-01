@@ -4,8 +4,8 @@
 // AsPlatform
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-	: X_Pos(AsConfig::X_Offset), Width(Width_Normal), Inner_Width(40), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), Platform_State(EPS_Normal), 
-	Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Platform_Y_Pos{}
+	: X_Pos(AsConfig::X_Offset), Width(Width_Normal), Inner_Width(40), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), Platform_State(EPS_Roll_In), 
+	Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Platform_Y_Pos{}, Roll_Step(0)
 {
 	X_Pos = (AsConfig::Max_X_Pos - Width) / 2;
 }
@@ -19,33 +19,53 @@ void AsPlatform::Init()
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Act(HWND Hwnd)
 {
+	if (Platform_State == EPS_Meltdown || Platform_State == EPS_Roll_In)
+		Redraw_Platform(Hwnd);
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AsPlatform::Set_State(EPlatform_State new_state)
+{
 	int i, len;
 
-	if (Platform_State != EPS_Meltdown)
-	{
-		Platform_State = EPS_Meltdown;	
+	if (Platform_State = new_state)
+		return;
 
-		len = sizeof(Meltdown_Platform_Y_Pos) / sizeof(Meltdown_Platform_Y_Pos[0]);
+	switch (new_state)
+	{
+	case EPS_Meltdown:
+						len = sizeof(Meltdown_Platform_Y_Pos) / sizeof(Meltdown_Platform_Y_Pos[0]);
 
 		for (i = 0; i < len; i++)
-		{
 			Meltdown_Platform_Y_Pos[i] = Platform_Rect.bottom;
-		}
-		
+	break; 
+
+	case EPS_Roll_In:
+		X_Pos = AsConfig::Max_X_Pos - 7;
+		Roll_Step = Max_Roll_Step - 7;
+		break;
 	}
-	
-	if (Platform_State == EPS_Meltdown)
-		Redraw_Platform(Hwnd);
+		Platform_State = new_state;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Redraw_Platform(HWND Hwnd)
 {	
 	Prev_Platform_Rect = Platform_Rect;
 
+	if (Platform_State == EPS_Normal || Platform_State == EPS_Meltdown)
+	{
 	Platform_Rect.left = X_Pos;
 	Platform_Rect.top = AsConfig::Platform_Y_Pos;
 	Platform_Rect.right = Platform_Rect.left + Width;
 	Platform_Rect.bottom = Platform_Rect.top + Height;
+	}
+
+	if (Platform_State == EPS_Roll_In)
+	{
+		Platform_Rect.left = X_Pos;
+		Platform_Rect.top = AsConfig::Platform_Y_Pos;
+		Platform_Rect.right = Platform_Rect.left + AsConfig::Circle_Size;
+		Platform_Rect.bottom = Platform_Rect.top + AsConfig::Circle_Size;
+	}
 
 	if (Platform_State == EPS_Meltdown)
 		Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 1);
@@ -57,6 +77,12 @@ void AsPlatform::Redraw_Platform(HWND Hwnd)
 void AsPlatform::Draw(HDC hdc, RECT& paint_area)
 //	Drawing platform for normal state
 {
+	RECT intersection_rect;
+
+	// EXAMINATION
+	if (!IntersectRect(&intersection_rect, &paint_area, &Platform_Rect))
+		return;
+
 	switch (Platform_State)
 	{
 	case EPS_Normal:
@@ -66,7 +92,26 @@ void AsPlatform::Draw(HDC hdc, RECT& paint_area)
 	case EPS_Meltdown:
 	AsPlatform::Draw_Meltdown_State(hdc, paint_area);
 	break;
+
+	case EPS_Roll_In:
+	AsPlatform::Draw_Roll_State(hdc, paint_area);
+	break;
 	}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AsPlatform::Draw_Highlight(HDC hdc, int x, int y)
+{
+SelectObject(hdc, Arc_Pen);
+
+Arc	(hdc, x + AsConfig::Level_Y_Offset, y + AsConfig::Level_Y_Offset, x + AsConfig::Ball_X_Offset, y + 2, x + 10, y - AsConfig::Brick_Width, x - 121, y - AsConfig::Brick_Width);
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AsPlatform::Clear_BG(HDC hdc)
+{
+	SelectObject(hdc, AsConfig::BG_Pen);
+	SelectObject(hdc, AsConfig::BG_Brush);
+
+	Rectangle(hdc, Prev_Platform_Rect.left, Prev_Platform_Rect.top, Prev_Platform_Rect.right, Prev_Platform_Rect.bottom);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Normal_State(HDC hdc, RECT& paint_area)
@@ -75,32 +120,26 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT& paint_area)
 	int x = X_Pos;
 	int y = AsConfig::Platform_Y_Pos;
 
-	RECT intersection_rect;
-
-	if (!IntersectRect(&intersection_rect, &paint_area, &Platform_Rect))
-		return;
-
 	// Cleen the window, when moving the platform
-	SelectObject(hdc, AsConfig::BG_Pen);
-	SelectObject(hdc, AsConfig::BG_Brush);
-	Rectangle(hdc, Prev_Platform_Rect.left, Prev_Platform_Rect.top, Prev_Platform_Rect.right, Prev_Platform_Rect.bottom);
-
+	Clear_BG(hdc);
+	
 	// 1. Drawing lateral circles
 	SelectObject(hdc, Platform_Circle_Pen);
 	SelectObject(hdc, Platform_Circle_Brush);
+
 	Ellipse(hdc, x, y, x + AsConfig::Circle_Size * AsConfig::Global_Scale, y + AsConfig::Circle_Size * AsConfig::Global_Scale);
+
 	Ellipse(hdc, x + (AsConfig::Circle_Size + Inner_Width), y, x + ((AsConfig::Circle_Size*2)+Inner_Width), y + AsConfig::Circle_Size);
 
 	// 2. Drawing inner part
 	SelectObject(hdc, Platform_Inner_Pen);
 	SelectObject(hdc, Platform_Inner_Brush);
+
 	RoundRect(hdc, x+9, y+18, x + (Inner_Width + 31), y + AsConfig::Global_Scale*2, 10 * AsConfig::Global_Scale, 32 * AsConfig::Global_Scale);
 
 	// 3. Drawing highlight
-	SelectObject(hdc, Arc_Pen);
-	Arc	(hdc, x+13, y+13, x+3, y+2, x+10, y - 61, x - 121, y - 61 );
-	//	good arc!! very good nice!!!
-}
+	Draw_Highlight(hdc, x, y);
+}		
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 //	Drawing platform for meltdown state
@@ -113,11 +152,6 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 	area_height = Height * AsConfig::Global_Scale + 1;
 
 	COLORREF pixel, bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
-	RECT intersection_rect;
-
-	// EXAMINATION
-	if (!IntersectRect(&intersection_rect, &paint_area, &Platform_Rect))
-		return;
 
 	for (i = 0; i < area_width; i++)
 	{
@@ -139,5 +173,77 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 		}
 		Meltdown_Platform_Y_Pos[i] += y_offset;
 	}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AsPlatform::Draw_Roll_State(HDC hdc, RECT& paint_area)
+{
+	int x = X_Pos;
+	int y = AsConfig::Platform_Y_Pos;
+	double alpha;
+	int roller_size = AsConfig::Circle_Size;
+	XFORM xForm, old_xForm;
+
+	Clear_BG(hdc);
+
+	// 1. Draw Ball
+	SelectObject(hdc, Platform_Circle_Pen);
+	SelectObject(hdc, Platform_Circle_Brush);
+
+	Ellipse(hdc, x, y, x + roller_size, y + roller_size);
+
+	// 2. Draw line border ball and rotate 30 degrees counterclockwise.
+	SetGraphicsMode(hdc, GM_ADVANCED);
+
+	alpha = -2 * M_PI / (double)Max_Roll_Step * (double)Roll_Step;
+
+	xForm.eM11 = (float)cos(alpha);
+	xForm.eM12 = (float)sin(alpha);
+	xForm.eM21 = (float)-sin(alpha);
+	xForm.eM22 = (float)cos(alpha);
+	xForm.eDx = (float)(x + roller_size / 2);
+	xForm.eDy = (float)(y + roller_size / 2);
+
+	GetWorldTransform(hdc, &old_xForm);
+	SetWorldTransform(hdc, &xForm);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	SelectObject(hdc, AsConfig::BG_Pen);
+	SelectObject(hdc, AsConfig::BG_Brush);
+
+	Rectangle(hdc, -3 / 2, -roller_size / 2, 3 / 2 - 1, roller_size / 2); 
+
+	SetWorldTransform(hdc, &old_xForm);
+
+	// 3.
+	Draw_Highlight(hdc, x, y);
+
+	++Roll_Step;
+
+	if (Roll_Step >= Max_Roll_Step)
+		Roll_Step -= Max_Roll_Step;
+
+	X_Pos -= Roll_Platform_Speed;
+
+	if (X_Pos <= End_Roll_X_Pos)
+		Platform_State = EPS_Exp_Roll_In;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

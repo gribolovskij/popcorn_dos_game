@@ -18,6 +18,7 @@ void AsEngine::Init(HWND hwnd)
 	Platform.Init();
 	Border.Init();
 
+	Platform.Set_State(EPS_Roll_In);
 	Platform.Redraw_Platform(Hwnd);
 
 	SetTimer(Hwnd, Timer_ID, 1000/AsConfig::FPS, 0);
@@ -27,9 +28,10 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 //	Drawing screen game
 {
 	Level.Draw(hdc, Hwnd);
-	Platform.Draw(hdc, paint_area);
 	Ball.Draw(hdc, paint_area);
 	Border.Draw(hdc, paint_area);
+
+	Platform.Draw(hdc, paint_area);
 	/*int i;
 	for (i = 0; i < 16; i++)
 	{

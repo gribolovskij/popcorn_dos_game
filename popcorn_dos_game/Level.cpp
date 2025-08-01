@@ -202,6 +202,7 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, Ebrick_Type brick_type, EL
 		xForm.eM22 = (float)cos(rotation_angle);
 		xForm.eDx  = (float)x;
 		xForm.eDy  = (float)y + (float)brick_half_height;
+
 		GetWorldTransform(hdc, &old_xForm);
 		SetWorldTransform(hdc, &xForm);
 

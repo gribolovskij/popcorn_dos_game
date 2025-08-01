@@ -42,7 +42,7 @@ void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border)
 		Rectangle(hdc, x + 7, y + 4, x + 11, y + 8);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void AsBorder::Draw(HDC hdc, RECT& paint_area)
+void AsBorder::Draw(HDC hdc, RECT &paint_area)
 //	Drawing screen game
 {
 	int i;

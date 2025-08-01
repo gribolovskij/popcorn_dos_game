@@ -52,5 +52,6 @@ public:
 	static const int Platform_Y_Pos = 550;
 	static const int Fault_Variable = 39;
 	static const int FPS = 40;
+	static const int Ball_X_Offset = 3;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
