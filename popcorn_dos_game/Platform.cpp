@@ -206,26 +206,6 @@ void AsPlatform::Draw_Roll_State(HDC hdc, RECT& paint_area)
 	GetWorldTransform(hdc, &old_xForm);
 	SetWorldTransform(hdc, &xForm);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	SelectObject(hdc, AsConfig::BG_Pen);
 	SelectObject(hdc, AsConfig::BG_Brush);
 
