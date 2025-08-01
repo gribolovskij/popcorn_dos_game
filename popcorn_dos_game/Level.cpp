@@ -69,7 +69,7 @@ void ALevel::Check_Level_Hit_Brick(int &next_y_pos, double &ball_direction)
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Draw(HDC hdc, HWND Hwnd)
+void ALevel::Draw(HDC hdc)
 {
 	RECT intersection_rect;
 

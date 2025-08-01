@@ -33,6 +33,8 @@ public:
 	static HPEN BG_Pen;
 	static HBRUSH BG_Brush;
 
+	static HWND Hwnd;
+
 	static const int Global_Scale = 1;
 	static const int Circle_Size = 20;
 	static const int Volume_Rectangle = 59; 

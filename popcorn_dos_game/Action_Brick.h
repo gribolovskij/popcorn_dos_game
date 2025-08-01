@@ -14,7 +14,7 @@ class AAction_Brick
 public:
 	AAction_Brick(Ebrick_Type brick_Type);
 	void Draw(HDC hdc);
-	void Act(HWND Hwnd);
+	void Act();
 	static void Setup_Colors();
 
 private:
@@ -25,6 +25,7 @@ private:
 	HBRUSH brush;
 
 	int Fade_Brick;
+
 	static unsigned char Get_Fading_Channel_Color(unsigned char color, unsigned char bg_color, int step);
 	static void Get_Fading_Color(const AColor &color, int step, HPEN &pen, HBRUSH &brush);
 

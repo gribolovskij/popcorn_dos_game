@@ -17,7 +17,7 @@ public:
 
 	void Init();
 	void Check_Level_Hit_Brick(int &next_y_pos, double &ball_direction);
-	void Draw(HDC hdc, HWND Hwnd);
+	void Draw(HDC hdc);
 
 	AAction_Brick Action_Brick;
 

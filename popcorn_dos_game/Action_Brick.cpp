@@ -8,7 +8,7 @@ HPEN AAction_Brick::Fading_Purple_Brick_Pens[Fade_Brick_Step];
 HBRUSH AAction_Brick::Fading_Purple_Brick_Brushes[Fade_Brick_Step];
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AAction_Brick::AAction_Brick(Ebrick_Type brick_Type)
-	: Fade_Brick(0), brick_rect{}, brick_Type(brick_Type), pen(0), brush(0)
+	: Fade_Brick(0), brick_rect{}, brick_Type(brick_Type)
 {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -40,12 +40,12 @@ void AAction_Brick::Draw(HDC hdc)
 	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right, brick_rect.bottom, 10 * AsConfig::Global_Scale, 32 * AsConfig::Global_Scale);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void AAction_Brick::Act(HWND Hwnd)
+void AAction_Brick::Act()
 {
 	if (Fade_Brick < Fade_Brick_Step - 1)
 	{
 		++Fade_Brick;
-		InvalidateRect(Hwnd, &brick_rect, FALSE);
+		InvalidateRect(AsConfig::Hwnd, &brick_rect, FALSE);
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
