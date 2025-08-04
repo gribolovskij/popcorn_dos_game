@@ -21,7 +21,7 @@ char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALevel::ALevel()
-	: Action_Brick(EBT_Purple), Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}
+	: Has_Floor(false), Action_Brick(EBT_Purple), Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}
 
 {
 } 
@@ -45,7 +45,7 @@ void ALevel::Init()
 
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Check_Level_Hit_Brick(int &next_y_pos, double &ball_direction)
+void ALevel::Check_Level_Hit_Brick(double &next_y_pos, double &ball_direction)
 {
 	// Correction position when reflecting from the bricks
 	int i;

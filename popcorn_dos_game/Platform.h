@@ -53,7 +53,7 @@ private:
 
 	static const int Height = 25;
 	static const int Meltdown_Speed = 3;
-	static const int Max_Roll_Step = 8;
+	static const int Max_Roll_Step = 16;
 	static const int End_Roll_X_Pos = 384;
 	static const int Roll_Platform_Speed = 7;
 	static const int Normal_Inner_Width = 40;

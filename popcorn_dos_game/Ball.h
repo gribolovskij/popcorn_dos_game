@@ -4,12 +4,19 @@
 #include "Level.h"
 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+enum EBall_State
+{
+	EBS_Normal,
+	EBS_Missing,
+	EBS_Ready
+};
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class ABall
 {
 public:
 	ABall();
 
-	void Init();
+	void Init(int x_pos);
 	void Draw(HDC hdc, RECT& paint_area);
 	void Move(ALevel *level, int platform_x_pos, int platform_width);
 
@@ -19,8 +26,11 @@ public:
 	HBRUSH Ball_Brush; 
 	RECT Ball_Rect, Prev_Ball_Rect;
 
+	EBall_State Ball_State;
+
 private:
-	int Ball_X_Pos, Ball_Y_Pos;
+
+	double Ball_X_Pos, Ball_Y_Pos;
 	int Ball_X_Offset, Ball_Y_Offset;
 	double Ball_Speed;
 

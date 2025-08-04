@@ -55,5 +55,6 @@ public:
 	static const int Fault_Variable = 39;
 	static const int FPS = 40;
 	static const int Ball_X_Offset = 3;
+	static const int Centering_Level = 426;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

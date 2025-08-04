@@ -2,6 +2,7 @@
 
 // AsEngine
 AsEngine::AsEngine()
+	: Game_State(EGS_Play_Level)
 {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -13,11 +14,11 @@ void AsEngine::Init(HWND hwnd)
 	AAction_Brick::Setup_Colors();
 
 	Level.Init();
-	Ball.Init();
 	Platform.Init();
+	Ball.Init(398);
 	Border.Init();
 
-	Platform.Set_State(EPS_Roll_In);
+	Platform.Set_State(EPS_Normal);
 	Platform.Redraw_Platform();
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000/AsConfig::FPS, 0);
@@ -27,8 +28,9 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 //	Drawing screen game
 {
 	Border.Draw(hdc, paint_area);
-	Level.Draw(hdc);
 	Ball.Draw(hdc, paint_area);
+	Level.Draw(hdc);
+
 	Platform.Draw(hdc, paint_area);
 	/*int i;
 	for (i = 0; i < 16; i++)
@@ -70,13 +72,34 @@ int AsEngine::On_Timer()
 {
 	++AsConfig::Tick_Current_Timer;
 
-	Ball.Move(&Level, Platform.X_Pos, Platform.Width);
+	switch (Game_State)
+	{
+
+	case EGS_Play_Level:
+		Ball.Move(&Level, Platform.X_Pos, Platform.Width);
+
+		if (Ball.Ball_State == EBS_Missing)
+		{
+			Game_State == EGS_Missing_Ball;
+			Platform.Set_State(EPS_Meltdown);
+		}
+		break;
+
+
+	case EGS_Missing_Ball:
+		break;
+
+
+	case EGS_Replay_Level:
+		break;
+	}
+	Platform.Act();
 
 	Level.Action_Brick.Act();
 
 	//			if (AsConfig::Tick_Current_Timer % 10 == 0)
 
-	Platform.Act();
+	
 
 	return 0;
 }
