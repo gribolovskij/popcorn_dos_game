@@ -5,7 +5,7 @@
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
 	: X_Pos(AsConfig::X_Offset), Width(Width_Normal), Inner_Width(Normal_Inner_Width), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), 
-	Platform_State(), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Platform_Y_Pos{}, Roll_Step(0)
+	Platform_State(EPS_Normal), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Platform_Y_Pos{}, Roll_Step(0)
 {
 	X_Pos = AsConfig::Max_X_Pos;
 }
@@ -29,12 +29,18 @@ void AsPlatform::Act()
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+EPlatform_State Get_State()
+{
+
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Set_State(EPlatform_State new_state)
 {
 	int i, len;
 
-	if (Platform_State = new_state)
+	if (Platform_State == new_state)
 		return;
+
 
 	switch (new_state)
 	{
@@ -44,6 +50,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 		for (i = 0; i < len; i++)
 			Meltdown_Platform_Y_Pos[i] = Platform_Rect.bottom;
 	break; 
+
 
 	case EPS_Roll_In:
 		X_Pos = AsConfig::Max_X_Pos - 7;
@@ -56,8 +63,15 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 void AsPlatform::Redraw_Platform()
 {	
 	int platform_width;
+	//int platform_centering_level;
 	Prev_Platform_Rect = Platform_Rect;
 
+	//if (Platform_State == EPS_Normal)
+
+	//	platform_centering_level = AsConfig::Centering_Level;
+	//else 
+
+	//	platform_centering_level = 0;
 
 	if (Platform_State == EPS_Roll_In)
 
@@ -67,17 +81,19 @@ void AsPlatform::Redraw_Platform()
 
 		platform_width = Width;
 
-	Platform_Rect.left = X_Pos;
+	Platform_Rect.left = X_Pos - AsConfig::Centering_Level; 
 	Platform_Rect.top = AsConfig::Platform_Y_Pos;
 	Platform_Rect.right = Platform_Rect.left + platform_width;
 	Platform_Rect.bottom = Platform_Rect.top + Height;
 
 	if (Platform_State == EPS_Meltdown)
+
 		Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 1);
 
 	InvalidateRect(AsConfig::Hwnd, &Prev_Platform_Rect, FALSE);
 	InvalidateRect(AsConfig::Hwnd, &Platform_Rect, FALSE);
 }
+
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw(HDC hdc, RECT& paint_area)
 //	Drawing platform for normal state

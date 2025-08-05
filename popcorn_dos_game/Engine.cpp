@@ -19,6 +19,7 @@ void AsEngine::Init(HWND hwnd)
 	Border.Init();
 
 	Platform.Set_State(EPS_Normal);
+
 	Platform.Redraw_Platform();
 
 	SetTimer(AsConfig::Hwnd, Timer_ID, 1000/AsConfig::FPS, 0);
@@ -48,21 +49,25 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 	case EKT_Left:
 		Platform.X_Pos -= Platform.X_Step;
 
-		if (Platform.X_Pos <= AsConfig::X_Offset)
-			Platform.X_Pos = AsConfig::X_Offset;
+		if (Platform.X_Pos <= AsConfig::X_Offset+426)
+			Platform.X_Pos = AsConfig::X_Offset+426;
 
 		Platform.Redraw_Platform();
 		break;
 
 	case EKT_Right:
 		Platform.X_Pos += Platform.X_Step;
-		if (Platform.X_Pos >= AsConfig::Max_X_Pos - Platform.Width + 32)
-			Platform.X_Pos = AsConfig::Max_X_Pos - Platform.Width + 32;
+		if (Platform.X_Pos >= AsConfig::Max_X_Pos - Platform.Width+ AsConfig::Centering_Level + 32)
+			Platform.X_Pos = AsConfig::Max_X_Pos - Platform.Width + AsConfig::Centering_Level + 32;
 
 		Platform.Redraw_Platform();
 		break;
 
 	case EKT_Space:
+		Ball.Move(&Level, Platform.X_Pos, Platform.Width);
+		if (Ball.Ball_State == EBS_Missing || Ball.Ball_State == EBS_Ready)
+			Game_State = EGS_Play_Level;
+		Ball.Ball_Speed = 8;
 		break;
 	}
 	return 0;
@@ -74,13 +79,12 @@ int AsEngine::On_Timer()
 
 	switch (Game_State)
 	{
-
 	case EGS_Play_Level:
 		Ball.Move(&Level, Platform.X_Pos, Platform.Width);
 
 		if (Ball.Ball_State == EBS_Missing)
 		{
-			Game_State == EGS_Missing_Ball;
+			Game_State = EGS_Missing_Ball;
 			Platform.Set_State(EPS_Meltdown);
 		}
 		break;
@@ -93,14 +97,11 @@ int AsEngine::On_Timer()
 	case EGS_Replay_Level:
 		break;
 	}
+
 	Platform.Act();
 
-	Level.Action_Brick.Act();
-
+	//	Level.Action_Brick.Act();
 	//			if (AsConfig::Tick_Current_Timer % 10 == 0)
-
-	
-
 	return 0;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

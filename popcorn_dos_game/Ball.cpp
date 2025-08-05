@@ -3,14 +3,14 @@
 // ABall
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ABall::ABall()
-	: Ball_X_Pos(0.0), Ball_Y_Pos(539.0), Ball_Y_Offset(-3), Ball_Speed(8), Ball_Direction(M_PI - M_PI_4), Ball_Brush(0), Prev_Ball_Rect{}, Ball_Rect{}, Ball_Pen(0), Ball_X_Offset(0),
+	: Ball_X_Pos(0.0), Ball_Y_Pos(539.0), Ball_Y_Offset(-3), Ball_Speed(8.0), Ball_Direction(M_PI - M_PI_4), Ball_Brush(0), Prev_Ball_Rect{}, Ball_Rect{}, Ball_Pen(0), Ball_X_Offset(0),
 	Ball_State(EBS_Normal)
 {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABall::Init(int x_pos)
 {
-	Ball_X_Pos = x_pos;
+	Ball_X_Pos = (double)x_pos;
 
 	AsConfig::Create_Pen_Brush(255, 0, 0, Ball_Pen, Ball_Brush);
 }
@@ -19,7 +19,7 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
-	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect))			// Cheking The Field Coloring After The Ball
+	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect))			// Cheking The Field Coloring After The Ball
 	{
 	//	1. Clean background
 	SelectObject(hdc, AsConfig::BG_Pen);
@@ -78,7 +78,7 @@ void ABall::Move(ALevel *level, int platform_x_pos, int platform_width)
 		}
 		else
 		{
-			if (next_y_pos > 2* max_y_pos + Ball_Size * 2)
+			if (next_y_pos < (double)max_y_pos + (double)Ball_Size);
 
 			Ball_State = EBS_Missing;
 		}		

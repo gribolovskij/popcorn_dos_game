@@ -27,12 +27,12 @@ public:
 	RECT Ball_Rect, Prev_Ball_Rect;
 
 	EBall_State Ball_State;
-
+	double Ball_Speed;
 private:
 
 	double Ball_X_Pos, Ball_Y_Pos;
 	int Ball_X_Offset, Ball_Y_Offset;
-	double Ball_Speed;
+
 
 	static const int Ball_Size = 14;
 };
