@@ -7,7 +7,7 @@ ABall::ABall()
 	: Ball_X_Pos(0.0), Ball_Y_Pos(Start_Ball_Y_Pos), Ball_Y_Offset(-3), Ball_Speed(0.0), Ball_Direction(0), Ball_Brush(0), Prev_Ball_Rect{}, Ball_Rect{}, Ball_Pen(0), Ball_X_Offset(0),
 	Ball_State(EBS_Normal)
 {
-	Set_State(EBS_Normal ,435);
+	Set_State(EBS_Ready ,435);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABall::Init()
@@ -136,9 +136,10 @@ void ABall::Set_State(EBall_State new_state, int x_pos)
 	case EBS_Ready:
 		Ball_X_Pos = (double)x_pos - (double)Ball_Size / 2.0;
 		Ball_Y_Pos = Start_Ball_Y_Pos;
-		Ball_State = EBS_Normal;
+		Ball_State = EBS_Ready;
 		Ball_Speed = 0.0;
 		Ball_Direction = M_PI - M_PI_4;
+		Redraw_Ball();
 		break;
 	}
 	Ball_State = new_state;
@@ -146,7 +147,6 @@ void ABall::Set_State(EBall_State new_state, int x_pos)
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABall::Redraw_Ball()
 {
-
 	Ball_Rect.left = (int)Ball_X_Pos;
 	Ball_Rect.top = (int)Ball_Y_Pos;
 	Ball_Rect.right = Ball_Rect.left + Ball_Size;
