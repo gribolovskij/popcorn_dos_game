@@ -5,8 +5,9 @@
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 enum EPlatform_State
 {
-	EPS_Normal,
 	EPS_Missing,
+	EPS_Ready,
+	EPS_Normal,
 	EPS_Meltdown,
 	EPS_Roll_In,
 	EPS_Exp_Roll_In
@@ -55,7 +56,7 @@ private:
 	static const int Height = 25;
 	static const int Meltdown_Speed = 3;
 	static const int Max_Roll_Step = 16;
-	static const int End_Roll_X_Pos = 384;
+	static const int End_Roll_X_Pos = 390;
 	static const int Roll_Platform_Speed = 7;
 	static const int Normal_Inner_Width = 40;
 };

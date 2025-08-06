@@ -16,24 +16,30 @@ class ABall
 public:
 	ABall();
 
-	void Init(int x_pos);
+	void Init();
 	void Draw(HDC hdc, RECT& paint_area);
 	void Move(ALevel *level, int platform_x_pos, int platform_width);
+	EBall_State Get_State();
+	void Set_State(EBall_State new_state, int x_pos);
 
-	double Ball_Direction;
+
+
+	static const int Ball_Y = 398;
+	static const int Ball_Size = 14;
+
+private:
+	void Redraw_Ball();
+
+	EBall_State Ball_State;
 
 	HPEN Ball_Pen;
 	HBRUSH Ball_Brush; 
 	RECT Ball_Rect, Prev_Ball_Rect;
-
-	EBall_State Ball_State;
+	
 	double Ball_Speed;
-private:
-
+	double Ball_Direction;
 	double Ball_X_Pos, Ball_Y_Pos;
 	int Ball_X_Offset, Ball_Y_Offset;
-
-
-	static const int Ball_Size = 14;
+	static const double Start_Ball_Y_Pos;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

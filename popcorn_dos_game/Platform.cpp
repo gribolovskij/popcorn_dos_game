@@ -7,7 +7,7 @@ AsPlatform::AsPlatform()
 	: X_Pos(AsConfig::X_Offset), Width(Width_Normal), Inner_Width(Normal_Inner_Width), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), 
 	Platform_State(EPS_Normal), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Platform_Y_Pos{}, Roll_Step(0)
 {
-	X_Pos = AsConfig::Max_X_Pos;
+	X_Pos = AsConfig::Max_X_Pos / 2;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Init()
@@ -29,9 +29,9 @@ void AsPlatform::Act()
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-EPlatform_State Get_State()
+EPlatform_State AsPlatform::Get_State()
 {
-
+	return Platform_State;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Set_State(EPlatform_State new_state)
@@ -40,7 +40,6 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 
 	if (Platform_State == new_state)
 		return;
-
 
 	switch (new_state)
 	{
@@ -53,8 +52,8 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 
 
 	case EPS_Roll_In:
-		X_Pos = AsConfig::Max_X_Pos - 7;
-		Roll_Step = Max_Roll_Step - 7;
+		X_Pos = AsConfig::Max_X_Pos + 14;
+		Roll_Step = Max_Roll_Step;
 		break;
 	}
 		Platform_State = new_state;
@@ -63,25 +62,22 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 void AsPlatform::Redraw_Platform()
 {	
 	int platform_width;
-	//int platform_centering_level;
 	Prev_Platform_Rect = Platform_Rect;
 
 	//if (Platform_State == EPS_Normal)
 
-	//	platform_centering_level = AsConfig::Centering_Level;
-	//else 
-
-	//	platform_centering_level = 0;
+	//	Platform_Rect.left = X_Pos - AsConfig::Centering_Level;
 
 	if (Platform_State == EPS_Roll_In)
-
+	{
+		Platform_Rect.left = X_Pos;
 		platform_width = AsConfig::Circle_Size;
-
+	}
 	else 
 
 		platform_width = Width;
 
-	Platform_Rect.left = X_Pos - AsConfig::Centering_Level; 
+	Platform_Rect.left = X_Pos; 
 	Platform_Rect.top = AsConfig::Platform_Y_Pos;
 	Platform_Rect.right = Platform_Rect.left + platform_width;
 	Platform_Rect.bottom = Platform_Rect.top + Height;
@@ -142,7 +138,7 @@ void AsPlatform::Clear_BG(HDC hdc)
 void AsPlatform::Draw_Normal_State(HDC hdc, RECT& paint_area)
 //	Drawing platform for normal state
 {
-	int x = X_Pos - AsConfig::Centering_Level;
+	int x = X_Pos ;
 	int y = AsConfig::Platform_Y_Pos;
 
 	// Cleen the window, when moving the platform
@@ -172,13 +168,22 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 	int y_offset;
 	int x, y;
 	int area_width, area_height;
-	COLORREF pixel, bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
+	int moved_col_count = 0;
+	int max_platform_y;
+	COLORREF pixel;
+	COLORREF bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
 
 	area_width = Width * AsConfig::Global_Scale;
 	area_height = Height * AsConfig::Global_Scale + 1;
 
+	max_platform_y = AsConfig::Max_Y_Pos + area_height;
+
 	for (i = 0; i < area_width; i++)
 	{
+		if(Meltdown_Platform_Y_Pos[i] > max_platform_y)
+			continue;
+		++moved_col_count;
+
 		y_offset = AsConfig::Rand(Meltdown_Speed) + 2;
 		x = Platform_Rect.left + i;
 
@@ -197,6 +202,9 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 		}
 		Meltdown_Platform_Y_Pos[i] += y_offset;
 	}
+
+	if (moved_col_count == 0)
+		Platform_State = EPS_Missing;		// The platform has been moved beyond the window border.
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Roll_State(HDC hdc, RECT& paint_area)
@@ -268,7 +276,7 @@ void AsPlatform::Draw_Exp_Roll_State(HDC hdc, RECT &paint_area)
 	if(Inner_Width >= Normal_Inner_Width)
 	{
 		Inner_Width = Normal_Inner_Width;
-		Platform_State = EPS_Normal;
+		Platform_State = EPS_Ready;
 		Redraw_Platform();
 	}
 }
