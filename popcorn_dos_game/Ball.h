@@ -41,5 +41,6 @@ private:
 	double Ball_X_Pos, Ball_Y_Pos;
 	int Ball_X_Offset, Ball_Y_Offset;
 	static const double Start_Ball_Y_Pos;
+	static const int Start_Ball_X_Pos = 388;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
