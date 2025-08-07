@@ -7,17 +7,17 @@ AsPlatform::AsPlatform()
 	: X_Pos(AsConfig::Border_X_Offset), Width(Width_Normal), Inner_Width(Normal_Inner_Width), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), 
 	Platform_State(EPS_Normal), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Platform_Y_Pos{}, Roll_Step(0)
 {
-	X_Pos = AsConfig::Max_X_Pos / 2;
+	X_Pos = (AsConfig::Max_X_Pos - Width) / 2;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
 // Correction position when reflecting from the platform
-	if (next_y_pos + ball -> Radius > AsConfig::Platform_Y_Pos - ball -> Radius)
+	if (next_y_pos + ball -> Radius > AsConfig::Platform_Y_Pos)
 	{
 		if (next_x_pos + ball -> Radius >= X_Pos && next_x_pos - ball -> Radius<= X_Pos + Width)
 		{
-			ball -> Ball_Direction = - M_PI + (M_PI - ball -> Ball_Direction);
+			ball -> Ball_Direction = M_PI + (M_PI - ball -> Ball_Direction);
 			return true;
 		}
 	}
