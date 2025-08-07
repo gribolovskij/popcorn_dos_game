@@ -7,17 +7,17 @@ AsPlatform::AsPlatform()
 	: X_Pos(AsConfig::Border_X_Offset), Width(Width_Normal), Inner_Width(Normal_Inner_Width), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), 
 	Platform_State(EPS_Normal), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Platform_Y_Pos{}, Roll_Step(0)
 {
-	X_Pos = AsConfig::Max_X_Pos / 2;
+	X_Pos = (AsConfig::Max_X_Pos - Width) / 2;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
 // Correction position when reflecting from the platform
-	if (next_y_pos + ball -> Radius > AsConfig::Platform_Y_Pos - ball -> Radius)
+	if (next_y_pos + ball -> Radius > AsConfig::Platform_Y_Pos)
 	{
 		if (next_x_pos + ball -> Radius >= X_Pos && next_x_pos - ball -> Radius<= X_Pos + Width)
 		{
-			ball -> Ball_Direction = - M_PI + (M_PI - ball -> Ball_Direction);
+			ball -> Ball_Direction = M_PI + (M_PI - ball -> Ball_Direction);
 			return true;
 		}
 	}
@@ -61,13 +61,13 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 				len = sizeof(Meltdown_Platform_Y_Pos) / sizeof(Meltdown_Platform_Y_Pos[0]);
 
 		for (i = 0; i < len; i++)
-			Meltdown_Platform_Y_Pos[i] = Platform_Rect.bottom;
+			Meltdown_Platform_Y_Pos[i] = AsConfig::Platform_Y_Pos + Height;
 	break; 
 
 
 	case EPS_Roll_In:
 		X_Pos = AsConfig::Max_X_Pos + 14;
-		Roll_Step = Max_Roll_Step;
+		Roll_Step = Max_Roll_Step - 1;
 		break;
 	}
 		Platform_State = new_state;
@@ -83,10 +83,8 @@ void AsPlatform::Redraw_Platform()
 	//	Platform_Rect.left = X_Pos - AsConfig::Centering_Level;
 
 	if (Platform_State == EPS_Roll_In)
-	{
-		Platform_Rect.left = X_Pos;
 		platform_width = AsConfig::Circle_Size;
-	}
+	
 	else 
 
 		platform_width = Width;
@@ -97,9 +95,10 @@ void AsPlatform::Redraw_Platform()
 	Platform_Rect.bottom = Platform_Rect.top + Height;
 
 	if (Platform_State == EPS_Meltdown)
-
-		Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 1);
-
+	{
+		Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 2);
+		Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 2);
+	}
 	InvalidateRect(AsConfig::Hwnd, &Prev_Platform_Rect, FALSE);
 	InvalidateRect(AsConfig::Hwnd, &Platform_Rect, FALSE);
 }
@@ -198,7 +197,7 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 			continue;
 		++moved_col_count;
 
-		y_offset = AsConfig::Rand(Meltdown_Speed) + 2;
+		y_offset = AsConfig::Rand(Meltdown_Speed) + 1;
 		x = Platform_Rect.left + i;
 
 		for (j = 0; j < area_height; j++)
