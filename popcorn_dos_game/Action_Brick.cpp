@@ -29,14 +29,14 @@ void AAction_Brick::Draw(HDC hdc, RECT& paint_area)
 	brush = Fading_Purple_Brick_Brushes[Fade_Brick];
 	break;
 	}
+	SelectObject(hdc, pen);
+	SelectObject(hdc, brush);
 
 	brick_rect.left = AsConfig::Brick_Height;
 	brick_rect.top = AsConfig::Fault_Variable;
 	brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height;
 	brick_rect.right = brick_rect.left + AsConfig::Brick_Width;
 
-	SelectObject(hdc, pen);
-	SelectObject(hdc, brush);
 	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right, brick_rect.bottom, 10 * AsConfig::Global_Scale, 32 * AsConfig::Global_Scale);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -55,7 +55,6 @@ void AAction_Brick::Setup_Colors()
 	for (i = 0; i < Fade_Brick_Step; i++)
 	{
 		Get_Fading_Color(AsConfig::Gray_Brick_Color, i, Fading_Blue_Brick_Pens[i], Fading_Blue_Brick_Brushes[i]);
-
 		Get_Fading_Color(AsConfig::Orange_Brick_Color, i, Fading_Purple_Brick_Pens[i], Fading_Purple_Brick_Brushes[i]);
 	}
 }

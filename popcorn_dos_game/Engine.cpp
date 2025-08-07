@@ -22,8 +22,6 @@ void AsEngine::Init(HWND hwnd)
 	ABall::Add_Hit_Checkers(&Platform);
 	ABall::Add_Hit_Checkers(&Border);
 
-
-
 	Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
 
 	Platform.Set_State(EPS_Normal);
@@ -84,6 +82,7 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 		Ball.Set_State(EBS_Normal, ABall::Ball_Y);
 		Platform.Set_State(EPS_Normal);
 		}
+		break;
 	}
 	return 0;
 }
