@@ -12,7 +12,7 @@ AAction_Brick::AAction_Brick(Ebrick_Type brick_Type)
 {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void AAction_Brick::Draw(HDC hdc)
+void AAction_Brick::Draw(HDC hdc, RECT& paint_area)
 {
 	HPEN pen = 0;
 	HBRUSH brush = 0;

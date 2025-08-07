@@ -13,7 +13,7 @@ class AAction_Brick
 {
 public:
 	AAction_Brick(Ebrick_Type brick_Type);
-	void Draw(HDC hdc);
+	void Draw(HDC hdc, RECT& paint_area);
 	void Act();
 	static void Setup_Colors();
 

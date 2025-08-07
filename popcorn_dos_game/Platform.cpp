@@ -10,6 +10,20 @@ AsPlatform::AsPlatform()
 	X_Pos = AsConfig::Max_X_Pos / 2;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
+{
+// Correction position when reflecting from the platform
+	if (next_y_pos + ball -> Radius > AsConfig::Platform_Y_Pos - ball -> Radius)
+	{
+		if (next_x_pos + ball -> Radius >= X_Pos && next_x_pos - ball -> Radius<= X_Pos + Width)
+		{
+			ball -> Ball_Direction = - M_PI + (M_PI - ball -> Ball_Direction);
+			return true;
+		}
+	}
+	return false;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Init()
 {
 	AsConfig::Create_Pen_Brush(155, 0, 0, Platform_Circle_Pen, Platform_Circle_Brush);

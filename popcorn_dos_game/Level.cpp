@@ -22,7 +22,6 @@ char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALevel::ALevel()
 	: Action_Brick(EBT_Purple), Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}
-
 {
 } 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -45,7 +44,7 @@ void ALevel::Init()
 
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Check_Level_Hit_Brick(double &next_y_pos, double &ball_direction)
+bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
 	// Correction position when reflecting from the bricks
 	int i;
@@ -58,22 +57,23 @@ void ALevel::Check_Level_Hit_Brick(double &next_y_pos, double &ball_direction)
 		{
 			if (Level_01[i][j] == 0)
 				continue;
-
+		
 			if (next_y_pos < brick_y_pos)
 			{
-				next_y_pos = brick_y_pos - (next_y_pos - brick_y_pos);	// bricks
-				ball_direction = -ball_direction;
+				ball -> Ball_Direction = - ball -> Ball_Direction;
 			}
 		}
+		return true;
 		brick_y_pos -= AsConfig::Cell_Height;
 	}
+	return false;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Draw(HDC hdc)
+void ALevel::Draw(HDC hdc, RECT& paint_area)
 {
 	RECT intersection_rect;
 
-	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
+	if (! IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
 		return;
 
 	int i,j;
@@ -82,7 +82,7 @@ void ALevel::Draw(HDC hdc)
 		for (j = 0; j< AsConfig::Level_Width; j++)
 			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (Ebrick_Type)Level_01[i][j]);
 
-	Action_Brick.Draw(hdc);
+	Action_Brick.Draw(hdc, paint_area);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
@@ -158,7 +158,7 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, Ebrick_Type brick_type, EL
 	if (rotation_step < 8)
 		rotation_angle = 2.0 * M_PI / 16 * (double)rotation_step;				// Delayed initialization
 	else
-		rotation_angle = 2.0 * M_PI / 16 * (double)(8L - (long long)rotation_step);
+		rotation_angle = 2.0 * M_PI / 16 * (double)(8L - rotation_step);
 
 	if (rotation_step > 4 && rotation_step <= 12)
 	{

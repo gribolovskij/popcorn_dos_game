@@ -60,7 +60,7 @@ void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border)
 		Rectangle(hdc, x + 7, y + 4, x + 11, y + 8);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool AsBorder::Check_Hit_Border(double next_x_pos, double next_y_pos, ABall *ball)
+bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
 	bool got_hit = false;
 	//	1. Correction position when reflecting from the frame
