@@ -27,8 +27,8 @@ public:
 	static void Create_Pen_Brush(const AColor &color, HPEN& pen, HBRUSH& brush);
 	static int Rand(int range);
 
+	static bool Level_Has_Floor;
 	static int 	Tick_Current_Timer;
-
 	static const AColor Gray_Brick_Color, Orange_Brick_Color, BG_Color;
 	static HPEN BG_Pen;
 	static HBRUSH BG_Brush;
@@ -49,8 +49,8 @@ public:
 	static const int Cell_Height = 26;
 	static const int Max_X_Pos = (Level_X_Offset + Cell_Width * Level_Width);
 	static const int Max_Y_Pos = 632;
-	static const int X_Offset = 22;
-	static const int Y_Offset = 17;
+	static const int Border_X_Offset = 22;
+	static const int Border_Y_Offset = 17;
 	static const int Platform_Y_Pos = 550;
 	static const int Fault_Variable = 39;
 	static const int FPS = 40;

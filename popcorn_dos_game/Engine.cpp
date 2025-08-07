@@ -35,6 +35,7 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 	Level.Draw(hdc);
 
 	Platform.Draw(hdc, paint_area);
+
 	/*int i;
 	for (i = 0; i < 16; i++)
 	{
@@ -51,8 +52,8 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 	case EKT_Left:
 		Platform.X_Pos -= Platform.X_Step;
 
-		if (Platform.X_Pos <= AsConfig::X_Offset)
-			Platform.X_Pos = AsConfig::X_Offset;
+		if (Platform.X_Pos <= AsConfig::Border_X_Offset)
+			Platform.X_Pos = AsConfig::Border_X_Offset;
 
 		Platform.Redraw_Platform();
 		break;
@@ -65,7 +66,7 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 		Platform.Redraw_Platform();
 		break;
 
-	/*case EKT_Space:																// My Logic
+	/*case EKT_Space:	// My Logic
 		if (Ball.Ball_State == EBS_Missing || Ball.Ball_State == EBS_Ready)
 		Game_State = EGS_Play_Level;
 		Ball.Ball_Speed = 8.0;
@@ -88,7 +89,7 @@ int AsEngine::On_Timer()
 	switch (Game_State)
 	{
 	case EGS_Play_Level:
-		Ball.Move(&Level, Platform.X_Pos, Platform.Width);
+		Ball.Move(Platform.X_Pos, Platform.Width, &Level, &Border);
 
 		if (Ball.Get_State() == EBS_Missing)
 		{

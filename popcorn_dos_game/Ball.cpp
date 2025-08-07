@@ -2,10 +2,11 @@
 
 // ABall
 const double ABall::Start_Ball_Y_Pos = 536.0;
+const double ABall::Radius = 7;
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ABall::ABall()
-	: Ball_X_Pos(0.0), Ball_Y_Pos(Start_Ball_Y_Pos), Ball_Y_Offset(-3), Ball_Speed(0.0), Ball_Direction(0), Ball_Brush(0), Prev_Ball_Rect{}, Ball_Rect{}, Ball_Pen(0), Ball_X_Offset(0),
-	Ball_State(EBS_Normal)
+	: Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Y_Offset(-3), Ball_Speed(0.0), Ball_Direction(0), Ball_Brush(0), Prev_Ball_Rect{}, Ball_Rect{}, Ball_Pen(0),
+	Ball_X_Offset(0), Ball_State(EBS_Normal), Rest_Distance(0.0)
 {
 	Set_State(EBS_Normal ,435);
 }
@@ -26,7 +27,7 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 	SelectObject(hdc, AsConfig::BG_Brush);
 
 	Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
-}
+	}
 
 	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect))			// Cheking The Field Coloring After The Ball
 	{
@@ -38,76 +39,49 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ABall::Move(ALevel *level, int platform_x_pos, int platform_width)
+void ABall::Move(int platform_x_pos, int platform_width, ALevel *level, AHit_Checker *check_hit)
 {
+	bool got_hit;
 	double next_x_pos, next_y_pos;
-	int max_x_pos = AsConfig::Max_X_Pos - Ball_Size;
-	int platform_y_pos = AsConfig::Platform_Y_Pos - Ball_Size;
-	int max_y_pos = AsConfig::Max_Y_Pos - Ball_Size;	
+	int platform_y_pos = AsConfig::Platform_Y_Pos;
+	double step_size = 1.0;
 
 	if (Ball_State != EBS_Normal)
 		return;
 
-	Prev_Ball_Rect = Ball_Rect;
+		Prev_Ball_Rect = Ball_Rect;
+		Rest_Distance += Ball_Speed;
 
-	next_x_pos = Ball_X_Pos + (Ball_Speed * cos(Ball_Direction) );
-	next_y_pos = Ball_Y_Pos - (Ball_Speed * sin(Ball_Direction) );
+	while(Rest_Distance >= step_size)
+	{
+		next_x_pos = Center_X_Pos + (step_size * cos(Ball_Direction));
+		next_y_pos = Center_Y_Pos - (step_size * sin(Ball_Direction));
 
-	//	1. Correction position when reflecting from the frame
-	if (next_x_pos < AsConfig::X_Offset)
-	{
-		next_x_pos = AsConfig::Level_X_Offset - (next_x_pos - AsConfig:: Level_X_Offset);	//left
-		Ball_Direction = M_PI - Ball_Direction;
-	}
-	if (next_y_pos < AsConfig::Y_Offset)
-	{
-		next_y_pos = AsConfig::Y_Offset - (next_y_pos - AsConfig::Y_Offset);	//top
-		Ball_Direction = - Ball_Direction;
-	}
-	if (next_x_pos > max_x_pos)
-	{
-		next_x_pos = max_x_pos - (next_x_pos - max_x_pos);				//right
-		Ball_Direction = M_PI - Ball_Direction;
-	}
-	if (next_y_pos > max_y_pos)
-	{
-		if (level->Has_Floor)
+		got_hit = check_hit -> Check_Hit_Border(next_x_pos, next_y_pos, this);
+	
+		/* Correction position when reflecting from the platform
+		if (next_y_pos > platform_y_pos)
 		{
-			next_y_pos = max_y_pos - (next_y_pos - max_y_pos);				//bottom
-			Ball_Direction = - Ball_Direction;
-		}
-		else
-		{
-			if (next_y_pos < max_y_pos + Ball_Size)
+			if (next_x_pos >= platform_x_pos && next_x_pos <= platform_x_pos + platform_width)
+			{
+				next_y_pos = platform_y_pos - (next_y_pos - platform_y_pos);
+				Ball_Direction = -Ball_Direction;
+			}
+		}*/
 
-			Ball_State = EBS_Missing;
-		}		
-}
+		// Correction position when reflecting from the bricks
+		//level->Check_Level_Hit_Brick(next_y_pos, Ball_Direction);
 
-	// Correction position when reflecting from the platform
-	if (next_y_pos > platform_y_pos)
-	{
-		if (next_x_pos >= platform_x_pos && next_x_pos <= platform_x_pos + platform_width)
+		if(! got_hit)
 		{
-			next_y_pos = platform_y_pos - (next_y_pos - platform_y_pos);
-			Ball_Direction = -Ball_Direction;
+		//	2. Ball continue move, if did not interact with other objects
+		Rest_Distance -= step_size;
+
+		Center_X_Pos = next_x_pos;
+		Center_Y_Pos = next_y_pos;
 		}
 	}
-
-	// Correction position when reflecting from the bricks
-	level->Check_Level_Hit_Brick(next_y_pos, Ball_Direction);
-
-	//	2. Move the ball
-	Ball_X_Pos = next_x_pos;
-	Ball_Y_Pos = next_y_pos;
-
-	Ball_Rect.left = (int)Ball_X_Pos;
-	Ball_Rect.top = (int)Ball_Y_Pos;
-	Ball_Rect.right = Ball_Rect.left + Ball_Size;
-	Ball_Rect.bottom = Ball_Rect.top + Ball_Size;
-
-	InvalidateRect(AsConfig::Hwnd, &Prev_Ball_Rect, FALSE);
-	InvalidateRect(AsConfig::Hwnd, &Ball_Rect, FALSE);
+		Redraw_Ball();
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 EBall_State ABall::Get_State()
@@ -120,9 +94,8 @@ void ABall::Set_State(EBall_State new_state, int x_pos)
 	switch (new_state)
 	{
 	case EBS_Normal:
-		Ball_X_Pos = (double)x_pos - (double)Ball_Size / 2.0;
-		Ball_Y_Pos = Start_Ball_Y_Pos;
-		Ball_State = EBS_Normal;
+		Center_X_Pos = (double)x_pos;
+		Center_Y_Pos = Start_Ball_Y_Pos;
 		Ball_Speed = 8.0;
 		Ball_Direction = M_PI - M_PI_4;
 		Redraw_Ball();
@@ -134,10 +107,10 @@ void ABall::Set_State(EBall_State new_state, int x_pos)
 		break;
 
 	case EBS_Ready:
-		Ball_X_Pos = (double)x_pos - (double)Ball_Size / 2.0;
-		Ball_Y_Pos = Start_Ball_Y_Pos;
-		Ball_State = EBS_Ready;
+		Center_X_Pos = (double)x_pos;
+		Center_Y_Pos = Start_Ball_Y_Pos;
 		Ball_Speed = 0.0;
+		Rest_Distance = 0.0;
 		Ball_Direction = M_PI - M_PI_4;
 		Redraw_Ball();
 		break;
@@ -147,12 +120,23 @@ void ABall::Set_State(EBall_State new_state, int x_pos)
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABall::Redraw_Ball()
 {
-	Ball_Rect.left = Start_Ball_X_Pos;
-	Ball_Rect.top = Start_Ball_Y_Pos;
-	Ball_Rect.right = Ball_Rect.left + Ball_Size;
-	Ball_Rect.bottom = Ball_Rect.top + Ball_Size;
+	Ball_Rect.left = (int)Center_X_Pos - Radius;
+	Ball_Rect.top = (int)Center_Y_Pos - Radius;
+	Ball_Rect.right = (int)Center_X_Pos + Radius;
+	Ball_Rect.bottom = (int)Center_Y_Pos + Radius;
 
 	InvalidateRect(AsConfig::Hwnd, &Prev_Ball_Rect, FALSE);
 	InvalidateRect(AsConfig::Hwnd, &Ball_Rect, FALSE);
 }
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//void ABall::Redraw_Ball()
+//{
+//	Ball_Rect.left = Start_Ball_X_Pos;
+//	Ball_Rect.top = Start_Ball_Y_Pos;
+//	Ball_Rect.right = Ball_Rect.left + Ball_Size;
+//	Ball_Rect.bottom = Ball_Rect.top + Ball_Size;
+//
+//	InvalidateRect(AsConfig::Hwnd, &Prev_Ball_Rect, FALSE);
+//	InvalidateRect(AsConfig::Hwnd, &Ball_Rect, FALSE);
+//}
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

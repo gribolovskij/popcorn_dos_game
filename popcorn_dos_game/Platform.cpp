@@ -4,7 +4,7 @@
 // AsPlatform
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-	: X_Pos(AsConfig::X_Offset), Width(Width_Normal), Inner_Width(Normal_Inner_Width), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), 
+	: X_Pos(AsConfig::Border_X_Offset), Width(Width_Normal), Inner_Width(Normal_Inner_Width), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), 
 	Platform_State(EPS_Normal), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Platform_Y_Pos{}, Roll_Step(0)
 {
 	X_Pos = AsConfig::Max_X_Pos / 2;

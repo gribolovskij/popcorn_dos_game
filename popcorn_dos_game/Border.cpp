@@ -11,6 +11,24 @@ void AsBorder::Init()
 	AsConfig::Create_Pen_Brush(255, 255, 255, Border_White_Pen, Border_White_Brush);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AsBorder::Draw(HDC hdc, RECT &paint_area)
+//	Drawing screen game
+{
+	int i;
+
+	// 1. Line border left
+	for (i = 0; i < 60; i++)
+		Draw_Element(hdc, 5, 1 + i * 12, false);
+
+	// 2. Line border right					
+	for (i = 0; i < 60; i++)				
+		Draw_Element(hdc, 788, 1 + i * 12, false);
+
+	// 3. Line top
+	for (i = 0; i < 79; i++)
+		Draw_Element(hdc, 8 + i * 10, 0, true);
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border)
 //	Draw frame element
 {
@@ -42,22 +60,37 @@ void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border)
 		Rectangle(hdc, x + 7, y + 4, x + 11, y + 8);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void AsBorder::Draw(HDC hdc, RECT &paint_area)
-//	Drawing screen game
+bool AsBorder::Check_Hit_Border(double next_x_pos, double next_y_pos, ABall *ball)
 {
-	int i;
+	bool got_hit = false;
+	//	1. Correction position when reflecting from the frame
+	if (next_x_pos - ball -> Radius < AsConfig::Border_X_Offset)
+	{
+		got_hit = true;
+		ball -> Ball_Direction = M_PI - ball -> Ball_Direction;
+	}
+	if (next_y_pos - ball -> Radius  < AsConfig::Border_Y_Offset)
+	{
+		got_hit = true;
+		ball -> Ball_Direction = - ball -> Ball_Direction;
+	}
+	if (next_x_pos + ball -> Radius > AsConfig::Max_X_Pos)
+	{
+		got_hit = true;
+		ball -> Ball_Direction = M_PI - ball -> Ball_Direction;
+	}
+	if (next_y_pos + ball -> Radius > AsConfig::Max_Y_Pos)
+	{
+		if (AsConfig::Level_Has_Floor)
+		{
+			next_y_pos = AsConfig::Max_Y_Pos - (next_y_pos - AsConfig::Max_Y_Pos);	//bottom
+			ball -> Ball_Direction = - ball -> Ball_Direction;
+		}
+		else
 
-	// 1. Line border left
-	for (i = 0; i < 60; i++)
-		Draw_Element(hdc, 5, 1 + i * 12, false);
-											
-	// 2. Line border right					
-	for (i = 0; i < 60; i++)				
-		Draw_Element(hdc, 788, 1 + i * 12, false);
-
-	// 3. Line top
-	for (i = 0; i < 79; i++)
-		Draw_Element(hdc, 8 + i * 10, 0, true);
+			if (next_y_pos + ball -> Radius > AsConfig::Max_Y_Pos + ball -> Radius * 4.0)
+				ball -> Set_State(EBS_Missing, next_x_pos);
+	}			
+	return got_hit;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-

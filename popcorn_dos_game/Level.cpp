@@ -21,7 +21,7 @@ char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALevel::ALevel()
-	: Has_Floor(false), Action_Brick(EBT_Purple), Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}
+	: Action_Brick(EBT_Purple), Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}
 
 {
 } 

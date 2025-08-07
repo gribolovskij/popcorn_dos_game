@@ -19,8 +19,6 @@ public:
 	void Check_Level_Hit_Brick(double &next_y_pos, double &ball_direction);
 	void Draw(HDC hdc);
 
-	bool Has_Floor;
-
 	AAction_Brick Action_Brick;
 
 	RECT Level_Rect;
