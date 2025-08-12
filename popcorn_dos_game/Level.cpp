@@ -55,8 +55,8 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	
 	for (i = AsConfig::Level_Height - 1; i >= 0; i--)
 	{
-		brick_y_high = AsConfig::Level_Y_Offset + i * AsConfig::Level_Height;
-		brick_y_low =  brick_y_high * AsConfig::Cell_Height;
+		brick_y_high = 9 + i * AsConfig::Cell_Height;
+		brick_y_low =  brick_y_high + AsConfig::Cell_Height;
 
 		for (j = 0; j < AsConfig::Level_Width; j++)
 		{
