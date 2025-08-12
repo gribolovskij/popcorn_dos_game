@@ -27,8 +27,9 @@ public:
 	void Move();
 	EBall_State Get_State();
 	void Set_State(EBall_State new_state, int x_pos);
-
-	double Ball_Direction;
+	double Get_Direction();
+	void Set_Direction(double new_direction);
+	void Reflect(bool from_horizontal);
 
 	static void Add_Hit_Checkers(AHit_Checker *hit_checker);
 
@@ -44,7 +45,8 @@ private:
 	HPEN Ball_Pen;
 	HBRUSH Ball_Brush; 
 	RECT Ball_Rect, Prev_Ball_Rect;
-	
+
+	double Ball_Direction;
 	double Ball_Speed;
 	double Rest_Distance;
 	double Center_X_Pos, Center_Y_Pos;
