@@ -25,8 +25,10 @@ public:
 	void Init();
 	void Draw(HDC hdc, RECT& paint_area);
 	void Move();
+	void Set_Test();
+	bool Test_Finish();
 	EBall_State Get_State();
-	void Set_State(EBall_State new_state, int x_pos);
+	void Set_State(EBall_State new_state, int x_pos, double y_pos = Start_Ball_Y_Pos);
 	double Get_Direction();
 	void Set_Direction(double new_direction);
 	void Reflect(bool from_horizontal);
@@ -46,13 +48,17 @@ private:
 	HBRUSH Ball_Brush; 
 	RECT Ball_Rect, Prev_Ball_Rect;
 
+	bool Test_Active;
+	
 	double Ball_Direction;
 	double Ball_Speed;
 	double Rest_Distance;
 	double Center_X_Pos, Center_Y_Pos;
+	double Test_Distance;
 	int Ball_X_Offset, Ball_Y_Offset;
-	static const double Start_Ball_Y_Pos;
+	int Test_Iteraton;
 
+	static const double Start_Ball_Y_Pos;
 	static const int Start_Ball_X_Pos = 388;
 	static int Count_Hit_Checkers;
 	static AHit_Checker *Hit_Checkers[3];

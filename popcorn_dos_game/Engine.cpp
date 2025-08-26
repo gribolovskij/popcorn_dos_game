@@ -2,7 +2,7 @@
 
 // AsEngine
 AsEngine::AsEngine()
-	: Game_State(EGS_Play_Level)
+	: Game_State(EGS_Test_Mode)
 {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -21,6 +21,8 @@ void AsEngine::Init(HWND hwnd)
 	ABall::Add_Hit_Checkers(&Level);
 	ABall::Add_Hit_Checkers(&Platform);
 	ABall::Add_Hit_Checkers(&Border);
+
+	Level.Set_Current_Level(ALevel::Test_Level);
 
 	Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
 
@@ -79,7 +81,7 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 	case EKT_Space:
 		if(Platform.Get_State() == EPS_Ready)
 		{
-		Ball.Set_State(EBS_Normal, ABall::Ball_Y);
+		//Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
 		Platform.Set_State(EPS_Normal);
 		}
 		break;
@@ -93,6 +95,11 @@ int AsEngine::On_Timer()
 
 	switch (Game_State)
 	{
+	case EGS_Test_Mode:
+		Ball.Set_Test();
+		Game_State = EGS_Play_Level;
+		break;
+
 	case EGS_Play_Level:
 		Ball.Move();
 
@@ -101,8 +108,10 @@ int AsEngine::On_Timer()
 			Game_State = EGS_Missing_Ball;
 			Platform.Set_State(EPS_Meltdown);
 		}
-		break;
 
+		if (Ball.Test_Finish() )
+		Game_State = EGS_Test_Mode;
+		break;
 
 	case EGS_Missing_Ball:
 		
@@ -112,7 +121,6 @@ int AsEngine::On_Timer()
 		Platform.Set_State(EPS_Roll_In);
 		}
 		break;
-
 
 	case EGS_Replay_Level:
 		if (Platform.Get_State() == EPS_Ready)
@@ -124,7 +132,6 @@ int AsEngine::On_Timer()
 	}
 
 	Platform.Act();
-
 	//	Level.Action_Brick.Act();
 	//			if (AsConfig::Tick_Current_Timer % 10 == 0)
 	return 0;

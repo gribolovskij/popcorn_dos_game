@@ -15,16 +15,21 @@ class ALevel: public AHit_Checker
 public:
 	ALevel();
 
-	void Init();
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball);
 	void Draw(HDC hdc, RECT& paint_area);
+	void Init();
+	void Set_Current_Level(char Level[AsConfig::Level_Height][AsConfig::Level_Width]);
+	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
+	static char Test_Level[AsConfig::Level_Height][AsConfig::Level_Width];
 
-	AAction_Brick Action_Brick;
+	//AAction_Brick Action_Brick;
 
 	RECT Level_Rect;
 
 private:
-	bool Hit_Circle_Line(double y, double left_x, double right_x, double radius, double next_x_pos);
+	bool Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflect_pos);
+	bool Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflect_pos);
+	bool Hit_Circle_Line(double y, double left_x, double right_x, double radius, double next_x_pos, double &x);
 
 	void Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type);
 	void Set_Brick_Letter_Colors(bool is_switch_color, HPEN& front_pen, HBRUSH& front_brush, HPEN& back_pen, HBRUSH& back_brush);
@@ -35,6 +40,10 @@ private:
 
 	RECT paint_area;
 
-	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
+	double Current_Brick_Left_X, Current_Brick_Right_X;
+	double Current_Brick_Y_High, Current_Brick_Y_Low;
+
+	char Current_Level[AsConfig::Level_Height][AsConfig::Level_Width];
+
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

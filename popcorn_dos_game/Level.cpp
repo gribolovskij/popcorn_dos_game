@@ -1,4 +1,4 @@
- #include "Level.h"
+#include "Level.h"
 #include "Config.h"
 // ALevel
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -20,72 +20,187 @@ char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+char ALevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
+{
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+};
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALevel::ALevel()
-	: Action_Brick(EBT_Purple), Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}
+	: Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}
 {
 } 
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Init()
-{
-	RECT intersection_rect;
-
-	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
-		return;
-
-	AsConfig::Create_Pen_Brush(AsConfig::Gray_Brick_Color, Blue_Brick_Pen, Blue_Brick_Brush);
-	AsConfig::Create_Pen_Brush(AsConfig::Orange_Brick_Color, Purple_Brick_Pen, Purple_Brick_Brush);
-
-	Letter_Pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
-
-	Level_Rect.left = AsConfig::Level_X_Offset;
-	Level_Rect.top = AsConfig::Level_Y_Offset;
-	Level_Rect.right = Level_Rect.left + AsConfig::Cell_Width * AsConfig::Level_Width;
-	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height;
-
-}
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
 	// Correction position when reflecting from the bricks
 	int i, j;
 
-	double direction = ball -> Get_Direction();
-	double brick_left_x, brick_right_x;
-	double brick_y_high, brick_y_low;
-	
-	for (i = AsConfig::Level_Height - 1; i >= 0; i--)
-	{
-		brick_y_high = 9 + i * AsConfig::Cell_Height;
-		brick_y_low =  brick_y_high + AsConfig::Cell_Height;
+	double direction;
+	double min_ball_x, max_ball_x;
+	double min_ball_y, max_ball_y;
+	int min_level_x, max_level_x;
+	int min_level_y, max_level_y;
+	bool horizon_got_hit, vertical_got_hit;
+	double horizon_reflect_pos, vertical_reflect_pos;
 
-		for (j = 0; j < AsConfig::Level_Width; j++)
+	if (next_y_pos > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
+		return false;
+
+	direction = ball -> Get_Direction();
+
+	min_ball_x = next_x_pos - ball -> Radius;
+	max_ball_x = next_x_pos - ball -> Radius;
+	min_ball_y = next_y_pos - ball -> Radius;
+	max_ball_y = next_y_pos - ball -> Radius;
+
+	min_level_x = (int)(min_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width;
+	max_level_x = (int)(max_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width;
+	min_level_y = (int)(min_ball_y - AsConfig::Level_Y_Offset) / (double)AsConfig::Cell_Height;
+	max_level_y = (int)(max_ball_y - AsConfig::Level_Y_Offset) / (double)AsConfig::Cell_Height;
+
+	for (i = max_level_y; i >= min_level_y; i--)
+	{
+		Current_Brick_Y_High = 27+ i * AsConfig::Cell_Height;
+		Current_Brick_Y_Low =  Current_Brick_Y_High + AsConfig::Cell_Height;
+
+		for (j = min_level_x; j <= max_level_x; j++)
 		{
-			if (Level_01[i][j] == 0)
+			if (Current_Level[i][j] == 0)
 				continue;
 
-			brick_left_x = AsConfig::Level_Y_Offset + j * AsConfig::Cell_Width;
-			brick_right_x = brick_left_x + AsConfig::Brick_Width;
+			Current_Brick_Left_X = AsConfig::Level_Y_Offset + j * AsConfig::Cell_Width;
+			Current_Brick_Right_X = Current_Brick_Left_X + AsConfig::Brick_Width;
 
-			// Check hit from down .. Checking for hits on the lower edge
-			if (direction >= 0 && direction < M_PI)
+			horizon_got_hit = Check_Horizontal_Hit(next_x_pos, next_y_pos, j, i, ball, horizon_reflect_pos);
 
- 			if (Hit_Circle_Line(next_y_pos - brick_y_low, brick_left_x, brick_right_x, ball->Radius, next_x_pos))
+			vertical_got_hit = Check_Vertical_Hit(next_x_pos, next_y_pos, j, i, ball, vertical_reflect_pos);
+
+			if (horizon_got_hit && vertical_got_hit)
 			{
-				ball -> Reflect(true);				
+				if (vertical_reflect_pos < horizon_reflect_pos)
+					ball -> Reflect(true);
+				else
+					ball -> Reflect(false);
 				return true;
 			}
-
-			// Check hit from up .. Checking for hits on the higher edge
-			if (direction >= M_PI && direction <= 2.0 * M_PI)
-
-				if (Hit_Circle_Line(next_y_pos - brick_y_high, brick_left_x, brick_right_x, ball->Radius, next_x_pos))
+			else
+				if (horizon_got_hit)
 				{
-					ball -> Reflect(true);
+					ball -> Reflect(false);
 					return true;
 				}
+				else
+					if (vertical_got_hit)
+					{
+						ball -> Reflect(true);
+						return true;
+					}
+
+
+		}
+	}
+	return false;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflect_pos)
+{
+	double direction = ball -> Get_Direction(); 
+
+	// Check hit from down .. Checking for hits on the lower edge
+	if (direction >= 0 && direction < M_PI)
+
+		if (Hit_Circle_Line(next_y_pos - Current_Brick_Y_Low, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, next_x_pos, reflect_pos))
+		{
+			// Ñhecking the possibility of a downward rebound
+			if (level_y < AsConfig::Level_Height - 1 && Current_Level[level_y + 1][level_x] == 0 )
+			{
+			return true;
 			}
+			else
+				return false;
+		}
+
+	// Check hit from up .. Checking for hits on the higher edge
+	if (direction >= M_PI && direction <= 2.0 * M_PI)
+
+		if (Hit_Circle_Line(next_y_pos - Current_Brick_Y_High, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, next_x_pos, reflect_pos))
+		{
+			// Ñhecking the possibility of a upward rebound
+			if (level_y > 0 && Current_Level[level_y - 1][level_x] == 0 )
+			{
+			return true;
+			}
+			else
+			return false;
 		}
 	return false;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflect_pos)
+{
+	double direction = ball -> Get_Direction();
+
+	// Check hit from left edge.. Checking for hits on the left edge
+	if (direction >= 0.0 && direction < M_PI || direction >= M_PI + M_PI_2 && direction <= 2.0 * M_PI)
+
+		if (Hit_Circle_Line(Current_Brick_Left_X - next_x_pos, Current_Brick_Y_High, Current_Brick_Y_Low, ball->Radius, next_y_pos, reflect_pos))
+		{
+			// Ñhecking the possibility of a leftward rebound
+			if (level_x > 0 && Current_Level[level_y][level_x - 1] == 0 )
+			{
+			return true;
+			}
+			else 
+				return false;
+		}
+
+	// Check hit from right edge.. Checking for hits on the right edge
+	if (direction > M_PI_2 && direction < M_PI + M_PI_2)
+
+		if (Hit_Circle_Line(Current_Brick_Right_X - next_x_pos, Current_Brick_Y_High, Current_Brick_Y_Low, ball->Radius, next_y_pos, reflect_pos))
+		{
+			// Ñhecking the possibility of a rightward rebound
+			if (level_x < AsConfig::Level_Width - 1 && Current_Level[level_y][level_x + 1] == 0 )
+			{
+			return true;
+			}
+			else
+				return false;
+		}
+	return false;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ALevel::Init()
+{
+	Letter_Pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+
+	AsConfig::Create_Pen_Brush(AsConfig::Gray_Brick_Color, Blue_Brick_Pen, Blue_Brick_Brush);
+	AsConfig::Create_Pen_Brush(AsConfig::Orange_Brick_Color, Purple_Brick_Pen, Purple_Brick_Brush);
+
+	Level_Rect.left = AsConfig::Level_X_Offset;
+	Level_Rect.top = AsConfig::Level_Y_Offset;
+	Level_Rect.right = Level_Rect.left + AsConfig::Cell_Width * AsConfig::Level_Width;
+	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height;
+
+	memset(Current_Level, 0, sizeof(Current_Level) );
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ALevel::Set_Current_Level(char Level[AsConfig::Level_Height][AsConfig::Level_Width])
+{
+	memcpy(Current_Level, Level, sizeof(Current_Level) );
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Draw(HDC hdc, RECT& paint_area)
@@ -99,16 +214,15 @@ void ALevel::Draw(HDC hdc, RECT& paint_area)
 
 	for (i = 0; i < AsConfig::Level_Height; i++)
 		for (j = 0; j< AsConfig::Level_Width; j++)
-			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (Ebrick_Type)Level_01[i][j]);
+			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (Ebrick_Type)Current_Level[i][j]);
 
-	Action_Brick.Draw(hdc, paint_area);
+	//Action_Brick.Draw(hdc, paint_area);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool ALevel::Hit_Circle_Line(double y, double left_x, double right_x, double radius, double next_x_pos)
+bool ALevel::Hit_Circle_Line(double y, double left_x, double right_x, double radius, double next_x_pos, double &x)
 {
 	// Check intersection horizontal segment (START left_x FINISH right_x) with a circle of radius
 
-	double x;
 	double min_x, max_x;
 
 	// x * x + y * y = R * R
