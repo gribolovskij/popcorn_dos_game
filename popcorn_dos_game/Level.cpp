@@ -62,9 +62,9 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	direction = ball -> Get_Direction();
 
 	min_ball_x = next_x_pos - ball -> Radius;
-	max_ball_x = next_x_pos - ball -> Radius;
+	max_ball_x = next_x_pos + ball -> Radius;
 	min_ball_y = next_y_pos - ball -> Radius;
-	max_ball_y = next_y_pos - ball -> Radius;
+	max_ball_y = next_y_pos + ball -> Radius;
 
 	min_level_x = (int)(min_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width;
 	max_level_x = (int)(max_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width;
@@ -73,15 +73,15 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 
 	for (i = max_level_y; i >= min_level_y; i--)
 	{
-		Current_Brick_Y_High = 27+ i * AsConfig::Cell_Height;
-		Current_Brick_Y_Low =  Current_Brick_Y_High + AsConfig::Cell_Height;
+		Current_Brick_Y_High = AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height;
+		Current_Brick_Y_Low =  Current_Brick_Y_High + AsConfig::Brick_Height;
 
 		for (j = min_level_x; j <= max_level_x; j++)
 		{
 			if (Current_Level[i][j] == 0)
 				continue;
 
-			Current_Brick_Left_X = AsConfig::Level_Y_Offset + j * AsConfig::Cell_Width;
+			Current_Brick_Left_X = AsConfig::Level_X_Offset + j * AsConfig::Cell_Width;
 			Current_Brick_Right_X = Current_Brick_Left_X + AsConfig::Brick_Width;
 
 			horizon_got_hit = Check_Horizontal_Hit(next_x_pos, next_y_pos, j, i, ball, horizon_reflect_pos);
@@ -108,11 +108,24 @@ bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 						ball -> Reflect(true);
 						return true;
 					}
-
-
 		}
 	}
 	return false;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ALevel::Init()
+{
+	Letter_Pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
+
+	AsConfig::Create_Pen_Brush(AsConfig::Gray_Brick_Color, Blue_Brick_Pen, Blue_Brick_Brush);
+	AsConfig::Create_Pen_Brush(AsConfig::Orange_Brick_Color, Purple_Brick_Pen, Purple_Brick_Brush);
+
+	Level_Rect.left = AsConfig::Level_X_Offset;
+	Level_Rect.top = AsConfig::Level_Y_Offset;
+	Level_Rect.right = Level_Rect.left + AsConfig::Cell_Width * AsConfig::Level_Width;
+	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height;
+
+	memset(Current_Level, 0, sizeof(Current_Level) );
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflect_pos)
@@ -154,7 +167,7 @@ bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int leve
 	double direction = ball -> Get_Direction();
 
 	// Check hit from left edge.. Checking for hits on the left edge
-	if (direction >= 0.0 && direction < M_PI || direction >= M_PI + M_PI_2 && direction <= 2.0 * M_PI)
+	if (direction >= 0.0 && direction < M_PI_2 || direction >= M_PI + M_PI_2 && direction <= 2.0 * M_PI)
 
 		if (Hit_Circle_Line(Current_Brick_Left_X - next_x_pos, Current_Brick_Y_High, Current_Brick_Y_Low, ball->Radius, next_y_pos, reflect_pos))
 		{
@@ -181,21 +194,6 @@ bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int leve
 				return false;
 		}
 	return false;
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Init()
-{
-	Letter_Pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
-
-	AsConfig::Create_Pen_Brush(AsConfig::Gray_Brick_Color, Blue_Brick_Pen, Blue_Brick_Brush);
-	AsConfig::Create_Pen_Brush(AsConfig::Orange_Brick_Color, Purple_Brick_Pen, Purple_Brick_Brush);
-
-	Level_Rect.left = AsConfig::Level_X_Offset;
-	Level_Rect.top = AsConfig::Level_Y_Offset;
-	Level_Rect.right = Level_Rect.left + AsConfig::Cell_Width * AsConfig::Level_Width;
-	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height;
-
-	memset(Current_Level, 0, sizeof(Current_Level) );
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Set_Current_Level(char Level[AsConfig::Level_Height][AsConfig::Level_Width])
@@ -234,8 +232,8 @@ bool ALevel::Hit_Circle_Line(double y, double left_x, double right_x, double rad
 
 	x = sqrt(radius * radius - y * y);
 
-	min_x = next_x_pos - x;
 	max_x = next_x_pos + x;
+	min_x = next_x_pos - x;
 
 	if (max_x >= left_x && max_x <= right_x || min_x >= left_x && min_x <= right_x)
 
@@ -302,7 +300,6 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, Ebrick_Type brick_type, EL
 	double offset;
 	double rotation_angle;		// Converting step to rotation angle
 	int brick_half_height = (AsConfig::Brick_Height / 2);
-	int brick_half_height_foreground = (AsConfig::Circle_Size / 2);
 	int back_part_offset;
 	HPEN front_pen, back_pen;
 	HBRUSH front_brush, back_brush;
@@ -377,7 +374,7 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, Ebrick_Type brick_type, EL
 		SelectObject(hdc, front_pen);
 		SelectObject(hdc, front_brush);
 
-		RoundRect(hdc, 0, brick_half_height_foreground, AsConfig::Volume_Rectangle, -brick_half_height_foreground, 10, 32);
+		RoundRect(hdc, 0, brick_half_height, AsConfig::Volume_Rectangle, -brick_half_height, 10, 32);
 
 		if (rotation_step > 4 && rotation_step <= 12)
 		{
