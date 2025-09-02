@@ -2,7 +2,7 @@
 
 // AsEngine
 AsEngine::AsEngine()
-	: Game_State(EGS_Test_Mode)
+	: Game_State(EGS_Play_Level)
 {
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -22,7 +22,7 @@ void AsEngine::Init(HWND hwnd)
 	ABall::Add_Hit_Checkers(&Platform);
 	ABall::Add_Hit_Checkers(&Border);
 
-	Level.Set_Current_Level(ALevel::Test_Level);
+	Level.Set_Current_Level(ALevel::Level_01);
 
 	Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
 
