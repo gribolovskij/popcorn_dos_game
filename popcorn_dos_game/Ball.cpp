@@ -60,13 +60,13 @@ void ABall::Move()
 	while(Rest_Distance >= step_size)
 	{
 		got_hit = false;
-		next_x_pos = Center_X_Pos + (step_size * cos(Ball_Direction));
-		next_y_pos = Center_Y_Pos - (step_size * sin(Ball_Direction));
+		next_x_pos = Center_X_Pos + step_size * cos(Ball_Direction);
+		next_y_pos = Center_Y_Pos - step_size * sin(Ball_Direction);
 
 		// Correction position when reflecting
 		for (i = 0; i < Count_Hit_Checkers; i++)
 		{
-			got_hit |= Hit_Checkers[i] ->  Check_Hit(next_x_pos, next_y_pos, this);
+			got_hit |= Hit_Checkers[i] -> Check_Hit(next_x_pos, next_y_pos, this);
 		}
 		if(! got_hit)
 		{
