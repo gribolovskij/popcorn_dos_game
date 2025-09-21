@@ -170,6 +170,48 @@ void ABall::Reflect(bool from_horizontal)
 		Set_Direction(M_PI - Ball_Direction);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool AHit_Checker::Hit_Circle_Line(double y, double left_x, double right_x, double radius, double next_x_pos, double& x)
+{
+	// Check intersection horizontal segment (START left_x FINISH right_x) with a circle of radius
+
+	double min_x, max_x;
+
+	// x * x + y * y = R * R
+	// x = sqrt(R * R - y * y)
+	// y = sqrt(R * R - x * x)
+
+	if (y > radius)
+		return false;
+
+	x = sqrt(radius * radius - y * y);
+
+	max_x = next_x_pos + x;
+	min_x = next_x_pos - x;
+
+	if (max_x >= left_x && max_x <= right_x || min_x >= left_x && min_x <= right_x)
+
+		return true;
+	else
+		return false;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool ABall::Is_Moving_Left()
+{
+	if (Ball_Direction > M_PI_2 && Ball_Direction < M_PI + M_PI_2)
+		return false;
+	else
+		return true;
+
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool ABall::Is_Moving_Up()
+{
+	if (Ball_Direction >= 0 && Ball_Direction < M_PI)
+		return false;
+	else
+		return true;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABall::Add_Hit_Checkers(AHit_Checker *hit_checker)
 {
 	if (Count_Hit_Checkers >= sizeof(Hit_Checkers) / sizeof(Hit_Checkers[0]) )

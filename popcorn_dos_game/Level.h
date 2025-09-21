@@ -29,7 +29,6 @@ public:
 private:
 	bool Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflect_pos);
 	bool Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflect_pos);
-	bool Hit_Circle_Line(double y, double left_x, double right_x, double radius, double next_x_pos, double &x);
 
 	void Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type);
 	void Set_Brick_Letter_Colors(bool is_switch_color, HPEN& front_pen, HBRUSH& front_brush, HPEN& back_pen, HBRUSH& back_brush);

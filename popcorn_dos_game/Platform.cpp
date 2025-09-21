@@ -12,16 +12,33 @@ AsPlatform::AsPlatform()
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
+	double reflect_pos, inner_left_x, inner_right_x, inner_top_y;
+
 // Correction position when reflecting from the platform
-	if (next_y_pos + ball -> Radius > AsConfig::Platform_Y_Pos)
+	if (next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
+		return false;
+
+	inner_top_y = AsConfig::Platform_Y_Pos - 3;
+	inner_left_x = X_Pos + ball->Ball_Size;
+	inner_right_x = X_Pos + Width + ball->Ball_Size;
+
+
+	if (ball->Is_Moving_Up())
 	{
+		if (Hit_Circle_Line(next_y_pos - inner_top_y, inner_left_x, inner_right_x, ball->Radius, next_x_pos, reflect_pos))
+		{
+			ball->Reflect(true);
+			return true;
+		}
+	}
+
+	else 
 		if (next_x_pos + ball -> Radius >= X_Pos && next_x_pos - ball -> Radius<= (double)(X_Pos + Width) )
 		{
 			ball -> Reflect(true);
 			return true;
 		}
-	}
-	return false;
+		return false;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Init()

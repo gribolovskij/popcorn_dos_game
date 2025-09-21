@@ -15,6 +15,8 @@ class AHit_Checker
 {
 public:
 	virtual bool Check_Hit(double next_x_pos, double next_y_pos, ABall *ball) = 0;
+
+	bool Hit_Circle_Line(double y, double left_x, double right_x, double radius, double next_x_pos, double& x);
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class ABall
@@ -32,6 +34,8 @@ public:
 	double Get_Direction();
 	void Set_Direction(double new_direction);
 	void Reflect(bool from_horizontal);
+	bool Is_Moving_Up();
+	bool Is_Moving_Left();
 
 	static void Add_Hit_Checkers(AHit_Checker *hit_checker);
 

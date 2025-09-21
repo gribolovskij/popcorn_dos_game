@@ -133,67 +133,65 @@ bool ALevel::Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_
 	double direction = ball -> Get_Direction(); 
 
 	// Check hit from down .. Checking for hits on the lower edge
-	if (direction >= 0 && direction < M_PI)
-
+	if (ball->Is_Moving_Up())
+	{
 		if (Hit_Circle_Line(next_y_pos - Current_Brick_Y_Low, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, next_x_pos, reflect_pos))
-		{
-			// Ñhecking the possibility of a downward rebound
-			if (level_y < AsConfig::Level_Height - 1 && Current_Level[level_y + 1][level_x] == 0 )
+		{// Ñhecking the possibility of a downward rebound
+			if (level_y < AsConfig::Level_Height - 1 && Current_Level[level_y + 1][level_x] == 0)
 			{
-			return true;
+				return true;
 			}
 			else
 				return false;
 		}
-
-	// Check hit from up .. Checking for hits on the higher edge
-	if (direction >= M_PI && direction <= 2.0 * M_PI)
-
+	}
+	else
+	{// Check hit from up .. Checking for hits on the higher edge
 		if (Hit_Circle_Line(next_y_pos - Current_Brick_Y_High, Current_Brick_Left_X, Current_Brick_Right_X, ball->Radius, next_x_pos, reflect_pos))
 		{
-			// Ñhecking the possibility of a upward rebound
-			if (level_y > 0 && Current_Level[level_y - 1][level_x] == 0 )
+			if (level_y > 0 && Current_Level[level_y - 1][level_x] == 0)
 			{
-			return true;
+				return true;
 			}
 			else
-			return false;
+				return false;
 		}
 	return false;
+	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflect_pos)
+bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall* ball, double& reflect_pos)
 {
-	double direction = ball -> Get_Direction();
+	double direction = ball->Get_Direction();
 
 	// Check hit from left edge.. Checking for hits on the left edge
-	if (direction >= 0.0 && direction < M_PI_2 || direction >= M_PI + M_PI_2 && direction <= 2.0 * M_PI)
-
+	if ( !ball->Is_Moving_Left()) 
+	{
 		if (Hit_Circle_Line(Current_Brick_Left_X - next_x_pos, Current_Brick_Y_High, Current_Brick_Y_Low, ball->Radius, next_y_pos, reflect_pos))
 		{
 			// Ñhecking the possibility of a leftward rebound
-			if (level_x > 0 && Current_Level[level_y][level_x - 1] == 0 )
+			if (level_x > 0 && Current_Level[level_y][level_x - 1] == 0)
 			{
-			return true;
-			}
-			else 
-				return false;
-		}
-
-	// Check hit from right edge.. Checking for hits on the right edge
-	if (direction > M_PI_2 && direction < M_PI + M_PI_2)
-
-		if (Hit_Circle_Line(Current_Brick_Right_X - next_x_pos, Current_Brick_Y_High, Current_Brick_Y_Low, ball->Radius, next_y_pos, reflect_pos))
-		{
-			// Ñhecking the possibility of a rightward rebound
-			if (level_x < AsConfig::Level_Width - 1 && Current_Level[level_y][level_x + 1] == 0 )
-			{
-			return true;
+				return true;
 			}
 			else
 				return false;
 		}
-	return false;
+}
+	else
+	{// Check hit from right edge.. Checking for hits on the right edge
+		if (Hit_Circle_Line(Current_Brick_Right_X - next_x_pos, Current_Brick_Y_High, Current_Brick_Y_Low, ball->Radius, next_y_pos, reflect_pos))
+		{
+			// Ñhecking the possibility of a rightward rebound
+			if (level_x < AsConfig::Level_Width - 1 && Current_Level[level_y][level_x + 1] == 0)
+			{
+				return true;
+			}
+			else
+				return false;
+		}
+		return false;
+	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Set_Current_Level(char Level[AsConfig::Level_Height][AsConfig::Level_Width])
@@ -215,31 +213,6 @@ void ALevel::Draw(HDC hdc, RECT& paint_area)
 			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (Ebrick_Type)Current_Level[i][j]);
 
 	//Action_Brick.Draw(hdc, paint_area);
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool ALevel::Hit_Circle_Line(double y, double left_x, double right_x, double radius, double next_x_pos, double &x)
-{
-	// Check intersection horizontal segment (START left_x FINISH right_x) with a circle of radius
-
-	double min_x, max_x;
-
-	// x * x + y * y = R * R
-	// x = sqrt(R * R - y * y)
-	// y = sqrt(R * R - x * x)
-
-	if (y >  radius)
-		return false;
-
-	x = sqrt(radius * radius - y * y);
-
-	max_x = next_x_pos + x;
-	min_x = next_x_pos - x;
-
-	if (max_x >= left_x && max_x <= right_x || min_x >= left_x && min_x <= right_x)
-
-		return true;
-	else
-		return false;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
