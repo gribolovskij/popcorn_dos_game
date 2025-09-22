@@ -1,5 +1,31 @@
 #include "Ball.h"
 
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool AHit_Checker::Hit_Circle_Line(double y, double left_x, double right_x, double radius, double next_x_pos, double& x)
+{
+	// Check intersection horizontal segment (START left_x FINISH right_x) with a circle of radius
+
+	double min_x, max_x;
+
+	// x * x + y * y = R * R
+	// x = sqrt(R * R - y * y)
+	// y = sqrt(R * R - x * x)
+
+	if (y > radius)
+		return false;
+
+	x = sqrt(radius * radius - y * y);
+
+	max_x = next_x_pos + x;
+	min_x = next_x_pos - x;
+
+	if (max_x >= left_x && max_x <= right_x || min_x >= left_x && min_x <= right_x)
+
+		return true;
+	else
+		return false;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const double ABall::Start_Ball_Y_Pos = 536.0;
 const double ABall::Radius = 7;
 int ABall::Count_Hit_Checkers = 0;
@@ -30,6 +56,8 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 	Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
 	}
 
+	if (Ball_State == EBS_Missing)
+		return;
 	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect))		// Cheking The Field Coloring After The Ball
 	{
 	//	2. Draw ball
@@ -39,8 +67,7 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 	Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right - 1, Ball_Rect.bottom - 1);
 	}
 
-	if (Ball_State == EBS_Missing)
-		return;
+	
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABall::Move()
@@ -118,7 +145,7 @@ void ABall::Set_State(EBall_State new_state, int x_pos, double y_pos)
 	switch (new_state)
 	{
 	case EBS_Normal:
-		Center_X_Pos = (double)x_pos;
+		Center_X_Pos = x_pos;
 		Center_Y_Pos = y_pos;
 		Ball_Speed = 8.0;
 		Rest_Distance = 0.0;
@@ -132,7 +159,7 @@ void ABall::Set_State(EBall_State new_state, int x_pos, double y_pos)
 		break;
 
 	case EBS_Ready:
-		Center_X_Pos = (double)x_pos;
+		Center_X_Pos = x_pos;
 		Center_Y_Pos = y_pos;
 		Ball_Speed = 0.0;
 		Rest_Distance = 0.0;
@@ -170,46 +197,21 @@ void ABall::Reflect(bool from_horizontal)
 		Set_Direction(M_PI - Ball_Direction);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool AHit_Checker::Hit_Circle_Line(double y, double left_x, double right_x, double radius, double next_x_pos, double& x)
-{
-	// Check intersection horizontal segment (START left_x FINISH right_x) with a circle of radius
-
-	double min_x, max_x;
-
-	// x * x + y * y = R * R
-	// x = sqrt(R * R - y * y)
-	// y = sqrt(R * R - x * x)
-
-	if (y > radius)
-		return false;
-
-	x = sqrt(radius * radius - y * y);
-
-	max_x = next_x_pos + x;
-	min_x = next_x_pos - x;
-
-	if (max_x >= left_x && max_x <= right_x || min_x >= left_x && min_x <= right_x)
-
-		return true;
-	else
-		return false;
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool ABall::Is_Moving_Left()
 {
 	if (Ball_Direction > M_PI_2 && Ball_Direction < M_PI + M_PI_2)
-		return false;
-	else
 		return true;
+	else
+		return false;
 
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool ABall::Is_Moving_Up()
 {
-	if (Ball_Direction >= 0 && Ball_Direction < M_PI)
-		return false;
-	else
+	if (Ball_Direction >= 0.0 && Ball_Direction < M_PI)
 		return true;
+	else
+		return false;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABall::Add_Hit_Checkers(AHit_Checker *hit_checker)

@@ -17,7 +17,7 @@ char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 char ALevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
@@ -35,7 +35,7 @@ char ALevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
 	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALevel::ALevel()
@@ -285,9 +285,9 @@ void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, Ebrick_Type brick_type, EL
 	rotation_step = rotation_step % 16;											// Take the remainder of the division by 16 and put it back into the variable
 
 	if (rotation_step < 8)
-		rotation_angle = 2.0 * M_PI / 16 * (double)rotation_step;				// Delayed initialization
+		rotation_angle = 2.0 * M_PI / 16.0 * (double)rotation_step;				// Delayed initialization
 	else
-		rotation_angle = 2.0 * M_PI / 16 * (double)(8L - rotation_step);
+		rotation_angle = 2.0 * M_PI / 16.0 * (double)(8 - rotation_step);
 
 	if (rotation_step > 4 && rotation_step <= 12)
 	{

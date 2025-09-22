@@ -36,6 +36,7 @@ public:
 	void Reflect(bool from_horizontal);
 	bool Is_Moving_Up();
 	bool Is_Moving_Left();
+	double Ball_Speed;
 
 	static void Add_Hit_Checkers(AHit_Checker *hit_checker);
 
@@ -55,7 +56,6 @@ private:
 	bool Test_Active;
 	
 	double Ball_Direction;
-	double Ball_Speed;
 	double Rest_Distance;
 	double Center_X_Pos, Center_Y_Pos;
 	double Test_Distance;
