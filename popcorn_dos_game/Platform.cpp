@@ -23,8 +23,12 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	inner_left_x = (double)(X_Pos + ball->Ball_Size);
 	inner_right_x = (double)(X_Pos + Width - ball->Ball_Size);
 
-ball->Ball_Speed = 0.5;
+	// Check hit circle platform right and left
 
+
+
+
+	// Check hit central platform up && down
 	if (ball->Is_Moving_Up())
 	{
 		if (Hit_Circle_Line(next_y_pos - inner_low_y, inner_left_x, inner_right_x, ball->Radius, next_x_pos, reflect_pos))
