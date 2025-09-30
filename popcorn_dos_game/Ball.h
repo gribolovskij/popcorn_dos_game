@@ -55,12 +55,12 @@ private:
 
 	bool Test_Active;
 	
-	double Ball_Direction;
 	double Rest_Distance;
 	double Center_X_Pos, Center_Y_Pos;
 	double Test_Distance;
 	int Ball_X_Offset, Ball_Y_Offset;
 	int Test_Iteraton;
+	double Ball_Direction;
 
 	static const double Start_Ball_Y_Pos;
 	static const int Start_Ball_X_Pos = 388;

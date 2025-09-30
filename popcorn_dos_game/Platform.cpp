@@ -12,21 +12,45 @@ AsPlatform::AsPlatform()
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
-	double reflect_pos, inner_left_x, inner_right_x, inner_top_y, inner_low_y;
+	double reflect_pos;
+	double inner_left_x, inner_right_x;
+	double inner_top_y, inner_low_y;
+	double dx, dy, dis_x, dis_y;
+	double distance, two_radius;
+	double platform_circle_radius;
+	double alpha, betta, gamma;
 
 // Correction position when reflecting from the platform
 	if (next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
 		return false;
 
-	inner_top_y = (double)(AsConfig::Platform_Y_Pos - ABall::Radius);
-	inner_low_y = (double)(AsConfig::Platform_Y_Pos + Height - ABall::Radius);
+	inner_top_y = (double)(AsConfig::Platform_Y_Pos - ball->Radius);
+	inner_low_y = (double)(AsConfig::Platform_Y_Pos + Height - ball->Radius);
 	inner_left_x = (double)(X_Pos + ball->Ball_Size);
 	inner_right_x = (double)(X_Pos + Width - ball->Ball_Size);
 
-	// Check hit circle platform right and left
+	// Check hit platform right and left circle
 
+	platform_circle_radius = AsConfig::Circle_Size / 2;
 
+	dis_x = (double)(X_Pos + platform_circle_radius);
+	dis_y = (double)(AsConfig::Platform_Y_Pos + platform_circle_radius);
 
+	dx = next_x_pos - dis_x;
+	dy = next_y_pos - dis_y;
+
+	distance = sqrt(dx * dx + dy * dy);
+
+	two_radius = ball->Radius + platform_circle_radius;
+
+	if (fabs(distance - two_radius) < AsConfig::Step_Move)
+	{	// ball hit circle platform
+		betta = atan2(-dy, dx);
+		alpha = betta + M_PI - ball->Get_Direction();
+		gamma = betta + alpha;
+
+		ball->Set_Direction(gamma);
+	}
 
 	// Check hit central platform up && down
 	if (ball->Is_Moving_Up())

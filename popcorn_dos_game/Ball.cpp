@@ -7,10 +7,6 @@ bool AHit_Checker::Hit_Circle_Line(double y, double left_x, double right_x, doub
 
 	double min_x, max_x;
 
-	// x * x + y * y = R * R
-	// x = sqrt(R * R - y * y)
-	// y = sqrt(R * R - x * x)
-
 	if (y > radius)
 		return false;
 
@@ -76,7 +72,6 @@ void ABall::Move()
 	bool got_hit;
 	double next_x_pos, next_y_pos;
 	int platform_y_pos = AsConfig::Platform_Y_Pos;
-	double step_size = 1.0;
 
 	if (Ball_State != EBS_Normal)
 		return;
@@ -84,11 +79,11 @@ void ABall::Move()
 		Prev_Ball_Rect = Ball_Rect;
 		Rest_Distance += Ball_Speed;
 
-	while(Rest_Distance >= step_size)
+	while(Rest_Distance >= AsConfig::Step_Move)
 	{
 		got_hit = false;
-		next_x_pos = Center_X_Pos + step_size * cos(Ball_Direction);
-		next_y_pos = Center_Y_Pos - step_size * sin(Ball_Direction);
+		next_x_pos = Center_X_Pos + AsConfig::Step_Move * cos(Ball_Direction);
+		next_y_pos = Center_Y_Pos - AsConfig::Step_Move * sin(Ball_Direction);
 
 		// Correction position when reflecting
 		for (i = 0; i < Count_Hit_Checkers; i++)
@@ -98,13 +93,13 @@ void ABall::Move()
 		if(! got_hit)
 		{
 		//	2. Ball continue move, if did not interact with other objects
-		Rest_Distance -= step_size;
+		Rest_Distance -= AsConfig::Step_Move;
 
 		Center_X_Pos = next_x_pos;
 		Center_Y_Pos = next_y_pos;
 		
 		if (Test_Active)
-		Test_Distance -= step_size;
+		Test_Distance -= AsConfig::Step_Move;
 		}
 	}
 		Redraw_Ball();

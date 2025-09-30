@@ -27,6 +27,7 @@ public:
 	static void Create_Pen_Brush(const AColor &color, HPEN& pen, HBRUSH& brush);
 	static int Rand(int range);
 
+
 	static bool Level_Has_Floor;
 	static int 	Tick_Current_Timer;
 	static const AColor Gray_Brick_Color, Orange_Brick_Color, BG_Color;
@@ -34,6 +35,8 @@ public:
 	static HBRUSH BG_Brush;
 
 	static HWND Hwnd;
+
+	static const double Step_Move;
 
 	static const int Global_Scale = 1;
 	static const int Circle_Size = 20;

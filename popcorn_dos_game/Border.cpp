@@ -88,8 +88,8 @@ bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 		}
 		else
 
-			if (next_y_pos + ball -> Radius > AsConfig::Max_Y_Pos + ball -> Radius * 4.0)
-				ball -> Set_State(EBS_Missing, next_x_pos);
+			if ((double)next_y_pos + ball -> Radius > AsConfig::Max_Y_Pos + ball -> Radius * 4.0)
+				ball -> Set_State(EBS_Missing, (double)next_x_pos);
 	}			
 	return got_hit;
 }
