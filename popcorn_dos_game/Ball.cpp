@@ -29,7 +29,7 @@ AHit_Checker *ABall::Hit_Checkers[] = {};
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ABall::ABall()
 	: Center_X_Pos(0.0), Center_Y_Pos(Start_Ball_Y_Pos), Ball_Y_Offset(-3), Ball_Speed(0.0), Ball_Direction(0), Ball_Brush(0), Prev_Ball_Rect{}, Ball_Rect{}, Ball_Pen(0),
-	Ball_X_Offset(0), Ball_State(EBS_Normal), Rest_Distance(0.0), Test_Iteraton(0), Test_Active(false)
+	Ball_X_Offset(0), Ball_State(EBS_Normal), Rest_Distance(0.0), Test_Iteraton(0), Test_Active(false), Test_Distance(0)
 {
 	// Set_State(EBS_Normal ,435);
 }
@@ -135,7 +135,7 @@ EBall_State ABall::Get_State()
 	return Ball_State;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ABall::Set_State(EBall_State new_state, int x_pos, double y_pos)
+void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 {
 	switch (new_state)
 	{

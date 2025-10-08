@@ -39,7 +39,8 @@ char ALevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALevel::ALevel()
-	: Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}
+	: Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}, Current_Brick_Left_X(0), 
+	Current_Brick_Right_X(0), Current_Brick_Y_High(0), Current_Brick_Y_Low(0), Current_Level{}
 {
 } 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

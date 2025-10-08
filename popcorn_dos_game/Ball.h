@@ -30,7 +30,7 @@ public:
 	void Set_Test();
 	bool Test_Finish();
 	EBall_State Get_State();
-	void Set_State(EBall_State new_state, int x_pos, double y_pos = Start_Ball_Y_Pos);
+	void Set_State(EBall_State new_state, double x_pos, double y_pos = Start_Ball_Y_Pos);
 	double Get_Direction();
 	void Set_Direction(double new_direction);
 	void Reflect(bool from_horizontal);

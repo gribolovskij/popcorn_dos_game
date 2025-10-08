@@ -14,50 +14,53 @@ void AsBorder::Init()
 void AsBorder::Draw(HDC hdc, RECT &paint_area)
 //	Drawing screen game
 {
+	int magic_number1 = 1, magic_number2 = 5, magic_number3 = 12, magic_number4 = 788, magic_number5 = 8, magic_number6 = 10, magic_number7 = 0;
 	int i;
 
 	// 1. Line border left
 	for (i = 0; i < 60; i++)
-		Draw_Element(hdc, 5, 1 + i * 12, false);
+		Draw_Element(hdc, magic_number2, magic_number1 + i * magic_number3, false);
 
 	// 2. Line border right					
 	for (i = 0; i < 60; i++)				
-		Draw_Element(hdc, 788, 1 + i * 12, false);
+		Draw_Element(hdc, magic_number4, magic_number1 + i * magic_number3, false);
 
 	// 3. Line top
 	for (i = 0; i < 79; i++)
-		Draw_Element(hdc, 8 + i * 10, 0, true);
+		Draw_Element(hdc, magic_number5 + i * magic_number6, magic_number7, true);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsBorder::Draw_Element(HDC hdc, int x, int y, bool top_border)
 //	Draw frame element
 {
+	int tb_correct_draw1 = 17, tb_correct_draw2 = 13, tb_correct_draw3 = 1, tb_correct_draw4 = 14, tb_correct_draw5 = 5, tb_correct_draw6 = 4, tb_correct_draw7 = 7, tb_correct_draw8 = 8, 	tb_correct_draw9 = 11;
+
 	//	 General blue color line border
 	SelectObject(hdc, Border_Blue_Pen);
 	SelectObject(hdc, Border_Blue_Brush);
 
 	if(top_border)
-		Rectangle(hdc, x, y+1, x + 13, y + 17);
+		Rectangle(hdc, x, y+tb_correct_draw3, x + tb_correct_draw2, y + tb_correct_draw1);
 	else
-		Rectangle(hdc, x + 1, y, x + 17, y  + 13);
+		Rectangle(hdc, x + tb_correct_draw3, y, x + tb_correct_draw1, y  + tb_correct_draw2);
 
 	//	 White color border
 	SelectObject(hdc, Border_White_Pen);
 	SelectObject(hdc, Border_White_Brush);
 
 	if(top_border)
-		Rectangle(hdc, x, y, x + 14, y + 4);
+		Rectangle(hdc, x, y, x + tb_correct_draw4, y + tb_correct_draw5);
 	else
-		Rectangle(hdc, x , y , x + 5, y + 14);
+		Rectangle(hdc, x , y , x + tb_correct_draw5, y + tb_correct_draw4);
 
 	//	 Perforation
 	SelectObject(hdc, AsConfig::BG_Pen);
 	SelectObject(hdc, AsConfig::BG_Brush);
 
 	if(top_border)
-		Rectangle(hdc, x + 4, y + 7, x + 8, y + 11);
+		Rectangle(hdc, x + tb_correct_draw6, y + tb_correct_draw7, x + tb_correct_draw8, y + tb_correct_draw9);
 	else
-		Rectangle(hdc, x + 7, y + 4, x + 11, y + 8);
+		Rectangle(hdc, x + tb_correct_draw7, y + tb_correct_draw6, x + tb_correct_draw9, y + tb_correct_draw8);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
@@ -88,8 +91,8 @@ bool AsBorder::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 		}
 		else
 
-			if ((double)next_y_pos + ball -> Radius > AsConfig::Max_Y_Pos + ball -> Radius * 4.0)
-				ball -> Set_State(EBS_Missing, (double)next_x_pos);
+			if (next_y_pos + ball -> Radius > AsConfig::Max_Y_Pos + ball -> Radius * 4.0)
+				ball -> Set_State(EBS_Missing, next_x_pos);
 	}			
 	return got_hit;
 }
