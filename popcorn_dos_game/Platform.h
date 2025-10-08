@@ -47,6 +47,7 @@ private:
 	void Draw_Roll_State(HDC hdc, RECT& paint_area);
 	void Draw_Exp_Roll_State(HDC hdc, RECT &paint_area);
 	void Draw_Highlight(HDC hdc, int x, int y);
+	bool Reflect_Platform_Circle(double next_x_pos, double next_y_pos, double dis_y_offset, ABall *ball);
 
 	EPlatform_State Platform_State;
 

@@ -15,10 +15,8 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	double reflect_pos;
 	double inner_left_x, inner_right_x;
 	double inner_top_y, inner_low_y;
-	double dx, dy, dis_x, dis_y;
-	double distance, two_radius;
-	double platform_circle_radius;
-	double alpha, betta, gamma;
+
+	double inner_y;
 
 // Correction position when reflecting from the platform
 	if (next_y_pos + ball->Radius < AsConfig::Platform_Y_Pos)
@@ -29,46 +27,25 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	inner_left_x = (double)(X_Pos + ball->Ball_Size);
 	inner_right_x = (double)(X_Pos + Width - ball->Ball_Size);
 
-	// Check hit platform right and left circle
-
-	platform_circle_radius = AsConfig::Circle_Size / 2;
-
-	dis_x = (double)(X_Pos + platform_circle_radius);
-	dis_y = (double)(AsConfig::Platform_Y_Pos + platform_circle_radius);
-
-	dx = next_x_pos - dis_x;
-	dy = next_y_pos - dis_y;
-
-	distance = sqrt(dx * dx + dy * dy);
-
-	two_radius = ball->Radius + platform_circle_radius;
-
-	if (fabs(distance - two_radius) < AsConfig::Step_Move)
-	{	// ball hit circle platform
-		betta = atan2(-dy, dx);
-		alpha = betta + M_PI - ball->Get_Direction();
-		gamma = betta + alpha;
-
-		ball->Set_Direction(gamma);
-	}
+	// Check reflect left circle platform
+	if (Reflect_Platform_Circle(next_x_pos, next_y_pos, 0.0, ball))
+		return true;
+	else
+		(Reflect_Platform_Circle(next_x_pos, next_y_pos, Width - AsConfig::Circle_Size, ball));
 
 	// Check hit central platform up && down
 	if (ball->Is_Moving_Up())
-	{
-		if (Hit_Circle_Line(next_y_pos - inner_low_y, inner_left_x, inner_right_x, ball->Radius, next_x_pos, reflect_pos))
+
+		inner_y = inner_low_y;
+	else
+		inner_y = inner_top_y;
+
+		if (Hit_Circle_Line(next_y_pos - inner_y, inner_left_x, inner_right_x, ball->Radius, next_x_pos, reflect_pos))
 		{
 			ball->Reflect(true);
 			return true;
 		}
-	}
-
-	else 
-		if (Hit_Circle_Line(next_y_pos - inner_top_y, inner_left_x, inner_right_x, ball->Radius, next_x_pos, reflect_pos))
-		{
-			ball -> Reflect(true);
-			return true;
-		}
-		return false;
+	return false;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Init()
@@ -339,5 +316,53 @@ void AsPlatform::Draw_Exp_Roll_State(HDC hdc, RECT &paint_area)
 		Platform_State = EPS_Ready;
 		Redraw_Platform();
 	}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool AsPlatform::Reflect_Platform_Circle(double next_x_pos, double next_y_pos, double dis_y_offset, ABall *ball)
+{	// Check hit platform right and left circle
+
+	double dx, dy, dis_x, dis_y;
+	double distance, two_radius;
+	double platform_circle_radius;
+	double alpha, betta, gamma;
+	double releated_ball_direction;
+
+	const double pi_2 = 2.0 * M_PI;
+
+	platform_circle_radius = AsConfig::Circle_Size / 2;
+
+	dis_x = (double)(X_Pos + platform_circle_radius);
+	dis_y = (double)(AsConfig::Platform_Y_Pos + platform_circle_radius);
+
+	dx = next_x_pos - dis_x;
+	dy = next_y_pos - dis_y;
+
+	distance = sqrt(dx * dx + dy * dy);
+
+	two_radius = ball->Radius + platform_circle_radius;
+
+	if (fabs(distance - two_radius) < AsConfig::Step_Move)
+	{	// ball hit circle platform
+		betta = atan2(-dy, dx);
+
+		releated_ball_direction = ball->Get_Direction();
+		releated_ball_direction -= betta;
+
+		if (releated_ball_direction > pi_2)
+			releated_ball_direction -= pi_2;
+
+		if(releated_ball_direction < 0.0)
+			releated_ball_direction += pi_2;
+
+		if (releated_ball_direction > M_PI_2 && releated_ball_direction < M_PI + M_PI_2)
+		{
+			alpha = betta + M_PI - ball->Get_Direction();
+			gamma = betta + alpha;
+
+			ball->Set_Direction(gamma);
+			return true;
+		}
+	}
+	return false;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
