@@ -81,7 +81,7 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 	case EKT_Space:
 		if(Platform.Get_State() == EPS_Ready)
 		{
-		//Ball.Set_State(EBS_Normal, Platform.X_Pos + Platform.Width / 2);
+		Ball.Set_State(EBS_Normal, Platform.X_Pos - 10 + Platform.Width / 2);
 		Platform.Set_State(EPS_Normal);
 		}
 		break;
@@ -132,7 +132,9 @@ int AsEngine::On_Timer()
 	}
 
 	Platform.Act();
-	//	Level.Action_Brick.Act();
+	Level.Act();
+
+
 	//			if (AsConfig::Tick_Current_Timer % 10 == 0)
 	return 0;
 }

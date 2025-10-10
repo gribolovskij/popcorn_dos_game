@@ -7,14 +7,22 @@ enum Ebrick_Type
 	EBT_None,
 	EBT_Purple,
 	EBT_Blue,
+	EBT_Teleport,
+	EBT_Reklama,
+	EBT_FourHits,
+	EBT_ThreeHits,
+	EBT_TwoHits,
+	EBT_Titan,
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class AAction_Brick
 {
 public:
-	AAction_Brick(Ebrick_Type brick_Type);
+	AAction_Brick(Ebrick_Type brick_Type, int level_x, int level_y);
+
 	void Draw(HDC hdc, RECT& paint_area);
 	void Act();
+	bool Is_Finished();
 	static void Setup_Colors();
 
 private:

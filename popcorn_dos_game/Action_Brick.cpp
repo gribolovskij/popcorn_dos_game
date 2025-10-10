@@ -7,9 +7,18 @@ HBRUSH AAction_Brick::Fading_Blue_Brick_Brushes[Fade_Brick_Step];
 HPEN AAction_Brick::Fading_Purple_Brick_Pens[Fade_Brick_Step];
 HBRUSH AAction_Brick::Fading_Purple_Brick_Brushes[Fade_Brick_Step];
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-AAction_Brick::AAction_Brick(Ebrick_Type brick_Type)
-	: Fade_Brick(0), brick_rect{}, brick_Type(brick_Type)
+AAction_Brick::AAction_Brick(Ebrick_Type brick_Type, int level_x, int level_y)
+	: Fade_Brick(0), brick_rect{}, brick_Type(brick_Type), brush{}, pen{}
 {
+		brick_rect.left = AsConfig::Level_X_Offset + level_x * AsConfig::Cell_Width;
+		brick_rect.top = AsConfig::Level_Y_Offset + level_y * AsConfig::Cell_Height;
+		brick_rect.right = brick_rect.left + AsConfig::Brick_Width;
+		brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height;
+
+	/*brick_rect.left = level_x * AsConfig::Brick_Height;
+	brick_rect.top = level_y * AsConfig::Fault_Variable;
+	brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height;
+	brick_rect.right = brick_rect.left + AsConfig::Brick_Width;*/
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AAction_Brick::Draw(HDC hdc, RECT& paint_area)
@@ -24,18 +33,14 @@ void AAction_Brick::Draw(HDC hdc, RECT& paint_area)
 	brush = Fading_Blue_Brick_Brushes[Fade_Brick];
 	break;
 
-	case EBT_Purple:
+	case EBT_Purple: 
 	pen = Fading_Purple_Brick_Pens[Fade_Brick];
 	brush = Fading_Purple_Brick_Brushes[Fade_Brick];
 	break;
 	}
+
 	SelectObject(hdc, pen);
 	SelectObject(hdc, brush);
-
-	brick_rect.left = AsConfig::Brick_Height;
-	brick_rect.top = AsConfig::Fault_Variable;
-	brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height;
-	brick_rect.right = brick_rect.left + AsConfig::Brick_Width;
 
 	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right, brick_rect.bottom, 10 * AsConfig::Global_Scale, 32 * AsConfig::Global_Scale);
 }
@@ -47,6 +52,14 @@ void AAction_Brick::Act()
 		++Fade_Brick;
 		InvalidateRect(AsConfig::Hwnd, &brick_rect, FALSE);
 	}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool AAction_Brick::Is_Finished()
+{
+	if (Fade_Brick >= Fade_Brick_Step)
+		return true;
+	else 
+		return false;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AAction_Brick::Setup_Colors()
