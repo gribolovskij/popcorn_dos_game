@@ -52,6 +52,8 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Key_Down(EKey_Type key_type)
 {
+	int offset_x_platform = 32;
+
 	// Platform movement from pressing WINDOW_Keys_Virtual
 	switch (key_type)
 	{
@@ -66,22 +68,16 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 
 	case EKT_Right:
 		Platform.X_Pos += Platform.X_Step;
-		if (Platform.X_Pos >= AsConfig::Max_X_Pos - Platform.Width + 32)
-			Platform.X_Pos = AsConfig::Max_X_Pos - Platform.Width + 32;
+		if (Platform.X_Pos >= AsConfig::Max_X_Pos - Platform.Width + offset_x_platform)
+			Platform.X_Pos = AsConfig::Max_X_Pos - Platform.Width + offset_x_platform;
 
 		Platform.Redraw_Platform();
 		break;
 
-	/*case EKT_Space:	// My Logic
-		if (Ball.Ball_State == EBS_Missing || Ball.Ball_State == EBS_Ready)
-		Game_State = EGS_Play_Level;
-		Ball.Ball_Speed = 8.0;
-		break; */
-
 	case EKT_Space:
 		if(Platform.Get_State() == EPS_Ready)
 		{
-		Ball.Set_State(EBS_Normal, Platform.X_Pos - 10 + Platform.Width / 2);
+		Ball.Set_State(EBS_Normal, Platform.X_Pos - 15 + Platform.Width / 2);
 		Platform.Set_State(EPS_Normal);
 		}
 		break;

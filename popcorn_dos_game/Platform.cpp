@@ -90,7 +90,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 
 
 	case EPS_Roll_In:
-		X_Pos = AsConfig::Max_X_Pos + 14;
+		X_Pos = AsConfig::Max_X_Pos;
 		Roll_Step = Max_Roll_Step - 1;
 		break;
 	}
