@@ -154,7 +154,7 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 		break;
 
 	case EBS_Ready:
-		Center_X_Pos = x_pos - 15; //AsEngine
+		Center_X_Pos = x_pos - AsConfig::Offset_X_Ball_For_Ready; 
 		Center_Y_Pos = y_pos; 
 		Ball_Speed = 0.0;
 		Rest_Distance = 0.0;

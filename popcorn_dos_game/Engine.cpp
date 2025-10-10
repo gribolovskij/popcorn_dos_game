@@ -53,6 +53,7 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 int AsEngine::On_Key_Down(EKey_Type key_type)
 {
 	int offset_x_platform = 32;
+	
 
 	// Platform movement from pressing WINDOW_Keys_Virtual
 	switch (key_type)
@@ -77,7 +78,7 @@ int AsEngine::On_Key_Down(EKey_Type key_type)
 	case EKT_Space:
 		if(Platform.Get_State() == EPS_Ready)
 		{
-		Ball.Set_State(EBS_Normal, Platform.X_Pos - 15 + Platform.Width / 2);
+		Ball.Set_State(EBS_Normal, Platform.X_Pos - AsConfig::Offset_X_Ball_For_Ready + Platform.Width / 2);
 		Platform.Set_State(EPS_Normal);
 		}
 		break;

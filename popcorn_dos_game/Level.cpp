@@ -65,7 +65,7 @@ void ALevel::Init()
 void ALevel::Act()
 {
 	int i;
-	for (i = 0; i < Action_Brick_Count; i++)
+	for (i = 0; i < AsConfig::Max_Action_Brick_Count; i++)
 	{
 		if (Action_Brick[i] != 0)
 		{
@@ -75,6 +75,7 @@ void ALevel::Act()
 			{
 				delete Action_Brick[i];
 				Action_Brick[i] = 0;
+				--Action_Brick_Count;
 			}
 		}
 	}
@@ -95,7 +96,7 @@ void ALevel::Draw(HDC hdc, RECT& paint_area)
 			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (Ebrick_Type)Current_Level[i][j]);
 
 
-	for (i = 0; i < Action_Brick_Count; i++)
+	for (i = 0; i < AsConfig::Max_Action_Brick_Count; i++)
 	{
 		if (Action_Brick[i] != 0)
 			Action_Brick[i]->Draw(hdc, paint_area);

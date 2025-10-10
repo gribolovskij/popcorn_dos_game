@@ -60,5 +60,6 @@ public:
 	static const int Ball_X_Offset = 3;
 	static const int Centering_Level = 426;
 	static const int Max_Action_Brick_Count = 10;
+	static const int Offset_X_Ball_For_Ready = 15;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
