@@ -25,8 +25,6 @@ public:
 	static char Level_01[AsConfig::Level_Height][AsConfig::Level_Width];
 	static char Test_Level[AsConfig::Level_Height][AsConfig::Level_Width];
 
-	//AAction_Brick Action_Brick;
-
 	RECT Level_Rect;
 
 private:

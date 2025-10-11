@@ -95,7 +95,6 @@ void ALevel::Draw(HDC hdc, RECT& paint_area)
 		for (j = 0; j< AsConfig::Level_Width; j++)
 			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (Ebrick_Type)Current_Level[i][j]);
 
-
 	for (i = 0; i < AsConfig::Max_Action_Brick_Count; i++)
 	{
 		if (Action_Brick[i] != 0)
@@ -224,12 +223,12 @@ void ALevel::Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
 	case EBT_None:	return;
 
 	case EBT_Purple:
-		pen = Purple_Brick_Pen;								 // Create color for 2 brick
+		pen = Purple_Brick_Pen;
 		brush = Purple_Brick_Brush;
 		break;
 
 	case EBT_Blue:
-		pen = Blue_Brick_Pen;								 // Create color for 1 brick
+		pen = Blue_Brick_Pen;
 		brush = Blue_Brick_Brush;
 		break;
 

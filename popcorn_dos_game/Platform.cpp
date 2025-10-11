@@ -1,6 +1,5 @@
 #include "Platform.h"
 
-
 // AsPlatform
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
@@ -15,7 +14,6 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	double reflect_pos;
 	double inner_left_x, inner_right_x;
 	double inner_top_y, inner_low_y;
-
 	double inner_y;
 
 // Correction position when reflecting from the platform
@@ -27,16 +25,16 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	inner_left_x = (double)(X_Pos + ball->Ball_Size);
 	inner_right_x = (double)(X_Pos + Width - ball->Ball_Size);
 
-	// Check reflect left circle platform
+// Check reflect left circle platform
 	if (Reflect_Platform_Circle(next_x_pos, next_y_pos, 0.0, ball))
 		return true;
 	else
 		(Reflect_Platform_Circle(next_x_pos, next_y_pos, Width - AsConfig::Circle_Size, ball));
 
-	// Check hit central platform up && down
+// Check hit central platform up && down
 	if (ball->Is_Moving_Up())
-
 		inner_y = inner_low_y;
+
 	else
 		inner_y = inner_top_y;
 
@@ -62,7 +60,7 @@ void AsPlatform::Act()
 		case EPS_Meltdown:
 		case EPS_Roll_In:
 		case EPS_Exp_Roll_In:
-		
+
 		Redraw_Platform();
 	}
 }
@@ -86,7 +84,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 
 		for (i = 0; i < len; i++)
 			Meltdown_Platform_Y_Pos[i] = AsConfig::Platform_Y_Pos + Height;
-	break; 
+	break;
 
 
 	case EPS_Roll_In:
@@ -98,7 +96,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Redraw_Platform()
-{	
+{
 	int platform_width;
 	Prev_Platform_Rect = Platform_Rect;
 
@@ -109,8 +107,7 @@ void AsPlatform::Redraw_Platform()
 	if (Platform_State == EPS_Roll_In)
 		platform_width = AsConfig::Circle_Size;
 	
-	else 
-
+	else
 		platform_width = Width;
 
 	Platform_Rect.left = X_Pos; 
@@ -123,6 +120,7 @@ void AsPlatform::Redraw_Platform()
 		Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 2);
 		Prev_Platform_Rect.bottom = (AsConfig::Max_Y_Pos + 2);
 	}
+
 	InvalidateRect(AsConfig::Hwnd, &Prev_Platform_Rect, FALSE);
 	InvalidateRect(AsConfig::Hwnd, &Platform_Rect, FALSE);
 }
@@ -139,20 +137,20 @@ void AsPlatform::Draw(HDC hdc, RECT& paint_area)
 
 	switch (Platform_State)
 	{
-	case EPS_Normal:
-	Draw_Normal_State(hdc, paint_area);
+		case EPS_Normal:
+		Draw_Normal_State(hdc, paint_area);
 	break;
 
-	case EPS_Meltdown:
-	Draw_Meltdown_State(hdc, paint_area);
+		case EPS_Meltdown:
+		Draw_Meltdown_State(hdc, paint_area);
 	break;
 
-	case EPS_Roll_In:
-	Draw_Roll_State(hdc, paint_area);
+		case EPS_Roll_In:
+		Draw_Roll_State(hdc, paint_area);
 	break;
 
-	case EPS_Exp_Roll_In:
-	Draw_Exp_Roll_State(hdc, paint_area);
+		case EPS_Exp_Roll_In:
+		Draw_Exp_Roll_State(hdc, paint_area);
 	break;
 	}
 }
@@ -160,7 +158,6 @@ void AsPlatform::Draw(HDC hdc, RECT& paint_area)
 void AsPlatform::Draw_Highlight(HDC hdc, int x, int y)
 {
 SelectObject(hdc, Arc_Pen);
-
 Arc	(hdc, x + AsConfig::Level_Y_Offset, y + AsConfig::Level_Y_Offset, x + AsConfig::Ball_X_Offset, y + 2, x + 10, y - AsConfig::Brick_Width, x - 121, y - AsConfig::Brick_Width);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

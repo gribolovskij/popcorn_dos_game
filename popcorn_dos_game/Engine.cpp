@@ -37,7 +37,6 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 //	Drawing screen game
 {
 	Level.Draw(hdc, paint_area);
-
 	Border.Draw(hdc, paint_area);
 	Platform.Draw(hdc, paint_area);
 	Ball.Draw(hdc, paint_area);
@@ -53,7 +52,6 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 int AsEngine::On_Key_Down(EKey_Type key_type)
 {
 	int offset_x_platform = 32;
-	
 
 	// Platform movement from pressing WINDOW_Keys_Virtual
 	switch (key_type)
@@ -130,7 +128,6 @@ int AsEngine::On_Timer()
 
 	Platform.Act();
 	Level.Act();
-
 
 	//			if (AsConfig::Tick_Current_Timer % 10 == 0)
 	return 0;

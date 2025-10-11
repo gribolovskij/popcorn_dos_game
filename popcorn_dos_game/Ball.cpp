@@ -45,7 +45,7 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 
 	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect))			// Cheking The Field Coloring After The Ball
 	{
-	//	1. Clean background
+//	1. Clean background
 	SelectObject(hdc, AsConfig::BG_Pen);
 	SelectObject(hdc, AsConfig::BG_Brush);
 
@@ -56,14 +56,12 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 		return;
 	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect))		// Cheking The Field Coloring After The Ball
 	{
-	//	2. Draw ball
+//	2. Draw ball
 	SelectObject(hdc, Ball_Pen);
 	SelectObject(hdc, Ball_Brush);
 
 	Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right, Ball_Rect.bottom);
 	}
-
-	
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABall::Move()
@@ -92,7 +90,7 @@ void ABall::Move()
 		}
 		if(! got_hit)
 		{
-		//	2. Ball continue move, if did not interact with other objects
+//	2. Ball continue move, if did not interact with other objects
 		Rest_Distance -= AsConfig::Step_Move;
 
 		Center_X_Pos = next_x_pos;
@@ -112,7 +110,6 @@ void ABall::Set_Test()
 
 	Set_State(EBS_Normal, 320 + Test_Iteraton, 100);
 	Ball_Direction = 2.0 * M_PI - M_PI_4;
-
 	++Test_Iteraton;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -126,7 +123,7 @@ bool ABall::Test_Finish()
 			Set_State(EBS_Missing, 0);
 			return true;
 		}
-			}
+	}
 			return false;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -188,7 +185,7 @@ void ABall::Reflect(bool from_horizontal)
 	if (from_horizontal)
 		Set_Direction(- Ball_Direction);
 
-	else 
+	else
 		Set_Direction(M_PI - Ball_Direction);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
