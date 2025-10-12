@@ -45,7 +45,7 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 	for (i = 0; i < 16; i++)
 	{
 		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 200, EBT_Blue, ELT_O, i);
-		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 130, EBT_Purple, ELT_O, i);
+		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 130, EBT_Yellow, ELT_O, i);
 	}*/
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

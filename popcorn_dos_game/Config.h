@@ -34,6 +34,9 @@ public:
 	static HPEN BG_Pen;
 	static HBRUSH BG_Brush;
 
+	static HPEN Purple_Brick_Pen, Blue_Brick_Pen,  Letter_Pen;
+	static HBRUSH Purple_Brick_Brush, Blue_Brick_Brush;
+
 	static HWND Hwnd;
 
 	static const double Step_Move;
@@ -61,5 +64,6 @@ public:
 	static const int Centering_Level = 426;
 	static const int Max_Action_Brick_Count = 10;
 	static const int Offset_X_Ball_For_Ready = 15;
+	static const int Max_Falling_Letter_Count = 10;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

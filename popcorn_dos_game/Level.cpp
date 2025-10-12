@@ -1,5 +1,131 @@
 #include "Level.h"
 #include "Config.h"
+
+// AFalling_Letter
+AFalling_Letter::AFalling_Letter(ELetter_Type letter_type)
+	: Letter_Type(letter_type)
+{
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AFalling_Letter::Draw_Brick_Letter(HDC hdc, int x, int y, EBrick_Type brick_type, ELetter_Type letter_type, int rotation_step)
+//	Drawing Falling Break with Letter
+{
+	bool switch_color;
+	double offset;
+	// Converting step to rotation angle
+	double rotation_angle;
+	int brick_half_height = (AsConfig::Brick_Height / 2);
+	int back_part_offset;
+	HPEN front_pen, back_pen;
+	HBRUSH front_brush, back_brush;
+	XFORM xForm, old_xForm;
+
+	if (!(brick_type == EBT_Blue || brick_type == EBT_Yellow))
+		// Falling letters can only be from this type of brick
+		return;
+
+	// Adjust the rotation step and rotation angle
+	// Take the remainder of the division by 16 and put it back into the variable
+	rotation_step = rotation_step % 16;
+
+	if (rotation_step < 8)
+		// Delayed initialization
+		rotation_angle = 2.0 * M_PI / 16.0 * (double)rotation_step;
+	else
+		rotation_angle = 2.0 * M_PI / 16.0 * (double)(8 - rotation_step);
+
+	if (rotation_step > 4 && rotation_step <= 12)
+	{
+		if (brick_type == EBT_Blue)
+			switch_color = true;
+		else
+			switch_color = false;
+		//	switch_color = brick_type == EBT_Blue;
+	}
+	else
+	{
+		if (brick_type == EBT_Yellow)
+			switch_color = true;
+		else
+			switch_color = false;
+	}
+	Set_Brick_Letter_Colors(switch_color, front_pen, front_brush, back_pen, back_brush);
+
+	if (rotation_step == 4 || rotation_step == 12)
+	{
+		// Display the background
+		SelectObject(hdc, back_pen);
+		SelectObject(hdc, back_brush);
+
+		Rectangle(hdc, x, y + brick_half_height - 3, x + AsConfig::Volume_Rectangle, y + brick_half_height);
+
+		// Display the foreground
+		SelectObject(hdc, front_pen);
+		SelectObject(hdc, front_brush);
+
+		Rectangle(hdc, x, y + brick_half_height, x + AsConfig::Volume_Rectangle, y + brick_half_height + 3);
+	}
+	else
+	{
+		SetGraphicsMode(hdc, GM_ADVANCED);
+
+		// Set up the letter "flip" matrix
+		xForm.eM11 = 1.0f;
+		xForm.eM12 = 0.0f;
+		xForm.eM21 = 0.0f;
+		xForm.eM22 = (float)cos(rotation_angle);
+		xForm.eDx = (float)x;
+		xForm.eDy = (float)y + (float)brick_half_height;
+
+		GetWorldTransform(hdc, &old_xForm);
+		SetWorldTransform(hdc, &xForm);
+
+		//	Deduced background
+		SelectObject(hdc, back_pen);
+		SelectObject(hdc, back_brush);
+
+		offset = (1.0 - fabs(xForm.eM22)) * 12;
+		back_part_offset = (int)round(offset);
+		RoundRect(hdc, 0, -brick_half_height - back_part_offset, AsConfig::Volume_Rectangle, brick_half_height - back_part_offset, 10, 32);
+
+		// Deduced foreground
+		SelectObject(hdc, front_pen);
+		SelectObject(hdc, front_brush);
+
+		RoundRect(hdc, 0, brick_half_height, AsConfig::Volume_Rectangle, -brick_half_height, 10, 32);
+
+		if (rotation_step > 4 && rotation_step <= 12)
+		{
+			if (letter_type == ELT_O)
+			{
+				SelectObject(hdc,  AsConfig::Letter_Pen);
+				Ellipse(hdc, AsConfig::Circle_Size, -AsConfig::Y_Letter, AsConfig::Circle_Size * 2, AsConfig::Y_Letter);
+			}
+		}
+		SetWorldTransform(hdc, &old_xForm);
+	}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AFalling_Letter::Set_Brick_Letter_Colors(bool is_switch_color, HPEN& front_pen, HBRUSH& front_brush, HPEN& back_pen, HBRUSH& back_brush)
+{
+	if (is_switch_color)
+	{
+		front_pen = AsConfig::Blue_Brick_Pen;
+		front_brush = AsConfig::Blue_Brick_Brush;
+		back_pen = AsConfig::Purple_Brick_Pen;
+		back_brush = AsConfig::Purple_Brick_Brush;
+	}
+	else
+	{
+		front_pen = AsConfig::Purple_Brick_Pen;
+		front_brush = AsConfig::Purple_Brick_Brush;
+		back_pen = AsConfig::Blue_Brick_Pen;
+		back_brush = AsConfig::Blue_Brick_Brush;
+	}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
 // ALevel
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
@@ -39,27 +165,20 @@ char ALevel::Test_Level[AsConfig::Level_Height][AsConfig::Level_Width] =
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 ALevel::ALevel()
-	:	Level_Rect{}, Purple_Brick_Pen(0), Blue_Brick_Pen(0), Letter_Pen(0), Purple_Brick_Brush(0), Blue_Brick_Brush(0), paint_area{}, Current_Brick_Left_X(0),
-	Current_Brick_Right_X(0), Current_Brick_Y_High(0), Current_Brick_Y_Low(0), Current_Level{}, Action_Brick_Count{}
+	:	Level_Rect{}, paint_area{}, Current_Brick_Left_X(0),
+	Current_Brick_Right_X(0), Current_Brick_Y_High(0), Current_Brick_Y_Low(0), Current_Level{}, Action_Brick_Count(), Falling_Brick_Count(), Falling_Letter{}, Action_Brick{}
 {
 } 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Init()
 {
-	Letter_Pen = CreatePen(PS_SOLID, 3, RGB(255, 255, 255));
-
-	AsConfig::Create_Pen_Brush(AsConfig::Gray_Brick_Color, Blue_Brick_Pen, Blue_Brick_Brush);
-	AsConfig::Create_Pen_Brush(AsConfig::Orange_Brick_Color, Purple_Brick_Pen, Purple_Brick_Brush);
-
 	Level_Rect.left = AsConfig::Level_X_Offset;
 	Level_Rect.top = AsConfig::Level_Y_Offset;
 	Level_Rect.right = Level_Rect.left + AsConfig::Cell_Width * AsConfig::Level_Width;
 	Level_Rect.bottom = Level_Rect.top + AsConfig::Cell_Height * AsConfig::Level_Height;
 
-
 	memset(Current_Level, 0, sizeof(Current_Level) );
 	memset(Action_Brick, 0, sizeof(Action_Brick) );
-
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Act()
@@ -93,7 +212,7 @@ void ALevel::Draw(HDC hdc, RECT& paint_area)
 
 	for (i = 0; i < AsConfig::Level_Height; i++)
 		for (j = 0; j< AsConfig::Level_Width; j++)
-			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (Ebrick_Type)Current_Level[i][j]);
+			Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (EBrick_Type)Current_Level[i][j]);
 
 	for (i = 0; i < AsConfig::Max_Action_Brick_Count; i++)
 	{
@@ -107,17 +226,125 @@ void ALevel::Set_Current_Level(char Level[AsConfig::Level_Height][AsConfig::Leve
 	memcpy(Current_Level, Level, sizeof(Current_Level) );
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Add_Active_Brick(int brick_x, int brick_y)
-{	
+void ALevel::On_Hit(int brick_x, int brick_y)
+{
+	EBrick_Type brick_type;
+	
+	brick_type = (EBrick_Type)Current_Level[brick_y][brick_x];
+
+	if (!Add_Falling_Letter(brick_x, brick_y, brick_type))
+		Add_Active_Brick(brick_x, brick_y, brick_type );
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool ALevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type)
+{
+	// Create Falling Letter
 	int i;
 
-	Ebrick_Type brick_type;
+	AFalling_Letter* falling_letter;
+
+	if (brick_type == EBT_Yellow || brick_type == EBT_Blue)
+	{
+		if (AsConfig::Rand(AsConfig::Max_Action_Brick_Count) == 0)
+		{
+			if (Falling_Brick_Count < AsConfig::Max_Action_Brick_Count)
+			{
+				for (i = 0; i < AsConfig::Max_Action_Brick_Count; i++)
+				{
+					falling_letter = new AFalling_Letter(ELT_O);
+					Falling_Letter[i] = falling_letter;
+					++Falling_Brick_Count;
+					break;
+				}
+			}
+			return true;
+		}
+	}
+	return false;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall* ball)
+{
+	// Correction position when reflecting from the bricks
+	int i, j;
+
+	double direction;
+	double min_ball_x, max_ball_x;
+	double min_ball_y, max_ball_y;
+	int min_level_x, max_level_x;
+	int min_level_y, max_level_y;
+	bool horizon_got_hit, vertical_got_hit;
+	double horizon_reflect_pos, vertical_reflect_pos;
+
+	if (next_y_pos + ball->Radius > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
+		return false;
+
+	direction = ball->Get_Direction();
+
+	min_ball_x = next_x_pos - ball->Radius;
+	max_ball_x = next_x_pos + ball->Radius;
+	min_ball_y = next_y_pos - ball->Radius;
+	max_ball_y = next_y_pos + ball->Radius;
+
+	min_level_x = (int)(min_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width;
+	max_level_x = (int)(max_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width;
+	min_level_y = (int)(min_ball_y - AsConfig::Level_Y_Offset) / (double)AsConfig::Cell_Height;
+	max_level_y = (int)(max_ball_y - AsConfig::Level_Y_Offset) / (double)AsConfig::Cell_Height;
+
+	for (i = max_level_y; i >= min_level_y; i--)
+	{
+		Current_Brick_Y_High = AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height;
+		Current_Brick_Y_Low = Current_Brick_Y_High + AsConfig::Brick_Height;
+
+		for (j = min_level_x; j <= max_level_x; j++)
+		{
+			if (Current_Level[i][j] == 0)
+				continue;
+
+			Current_Brick_Left_X = AsConfig::Level_X_Offset + j * AsConfig::Cell_Width;
+			Current_Brick_Right_X = Current_Brick_Left_X + AsConfig::Brick_Width;
+
+			horizon_got_hit = Check_Horizontal_Hit(next_x_pos, next_y_pos, j, i, ball, horizon_reflect_pos);
+
+			vertical_got_hit = Check_Vertical_Hit(next_x_pos, next_y_pos, j, i, ball, vertical_reflect_pos);
+
+			if (horizon_got_hit && vertical_got_hit)
+			{
+				if (vertical_reflect_pos < horizon_reflect_pos)
+					ball->Reflect(true);
+				else
+					ball->Reflect(false);
+				On_Hit(j, i);
+
+				return true;
+			}
+			else
+				if (horizon_got_hit)
+				{
+					ball->Reflect(false);
+					On_Hit(j, i);
+					return true;
+				}
+				else
+					if (vertical_got_hit)
+					{
+						ball->Reflect(true);
+						On_Hit(j, i);
+						return true;
+					}
+		}
+	}
+	return false;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ALevel::Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type)
+{
+	//Create Active_Brick
+	int i;
 	AAction_Brick *action_brick;
 
 	if (Action_Brick_Count >= AsConfig::Max_Action_Brick_Count)
 		return;
-
-	brick_type = (Ebrick_Type)Current_Level[brick_y][brick_x];
 
 	switch(brick_type)
 	{
@@ -125,7 +352,7 @@ void ALevel::Add_Active_Brick(int brick_x, int brick_y)
 		return;
 
 	case EBT_Blue:
-	case EBT_Purple:
+	case EBT_Yellow:
 		action_brick = new AAction_Brick(brick_type, brick_x, brick_y);
 		break;
 
@@ -212,7 +439,7 @@ bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int leve
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
+void ALevel::Draw_Brick(HDC hdc, int x, int y, EBrick_Type brick_type)
 //	Вывод кирпича
 {
 	HPEN pen;
@@ -222,14 +449,14 @@ void ALevel::Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
 	{
 	case EBT_None:	return;
 
-	case EBT_Purple:
-		pen = Purple_Brick_Pen;
-		brush = Purple_Brick_Brush;
+	case EBT_Yellow:
+		pen = AsConfig::Purple_Brick_Pen;
+		brush = AsConfig::Purple_Brick_Brush;
 		break;
 
 	case EBT_Blue:
-		pen = Blue_Brick_Pen;
-		brush = Blue_Brick_Brush;
+		pen = AsConfig::Blue_Brick_Pen;
+		brush = AsConfig::Blue_Brick_Brush;
 		break;
 
 	default: 
@@ -239,194 +466,5 @@ void ALevel::Draw_Brick(HDC hdc, int x, int y, Ebrick_Type brick_type)
 	SelectObject(hdc, pen);
 	SelectObject(hdc, brush);
 	RoundRect(hdc, x * AsConfig::Global_Scale, y * AsConfig::Global_Scale, AsConfig::Brick_Width + x * AsConfig::Global_Scale, AsConfig::Brick_Height + y * AsConfig::Global_Scale, 10*AsConfig::Global_Scale, 32*AsConfig::Global_Scale);
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Set_Brick_Letter_Colors(bool is_switch_color, HPEN &front_pen, HBRUSH &front_brush, HPEN &back_pen, HBRUSH &back_brush)	
-{
-	if (is_switch_color)
-	{
-		front_pen = Blue_Brick_Pen;
-		front_brush = Blue_Brick_Brush;
-		back_pen = Purple_Brick_Pen;
-		back_brush = Purple_Brick_Brush;
-	}
-	else
-	{
-		front_pen = Purple_Brick_Pen;
-		front_brush = Purple_Brick_Brush;
-		back_pen = Blue_Brick_Pen;
-		back_brush = Blue_Brick_Brush;
-	}
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Draw_Brick_Letter(HDC hdc, int x, int y, Ebrick_Type brick_type, ELetter_Type letter_type,int rotation_step)
-//	Drawing Falling Break with Letter
-{
-	bool switch_color;
-	double offset;
-	double rotation_angle;		// Converting step to rotation angle
-	int brick_half_height = (AsConfig::Brick_Height / 2);
-	int back_part_offset;
-	HPEN front_pen, back_pen;
-	HBRUSH front_brush, back_brush;
-	XFORM xForm, old_xForm;
-
-	if (!(brick_type == EBT_Blue || brick_type == EBT_Purple))
-// Falling letters can only be from this type of brick
-		return;
-
-// Adjust the rotation step and rotation angle
-// Take the remainder of the division by 16 and put it back into the variable
-	rotation_step = rotation_step % 16;
-
-	if (rotation_step < 8)
-		// Delayed initialization
-		rotation_angle = 2.0 * M_PI / 16.0 * (double)rotation_step;
-	else
-		rotation_angle = 2.0 * M_PI / 16.0 * (double)(8 - rotation_step);
-
-	if (rotation_step > 4 && rotation_step <= 12)
-	{
-		if (brick_type == EBT_Blue)
-			switch_color = true;
-		else 
-			switch_color = false;
-		//	switch_color = brick_type == EBT_Blue;
-	}
-	else
-	{
-		if (brick_type == EBT_Purple)
-			switch_color = true;
-		else
-			switch_color = false;
-	}
-	Set_Brick_Letter_Colors(switch_color, front_pen, front_brush, back_pen, back_brush);
-
-	if (rotation_step == 4 || rotation_step == 12)
-	{
-		// Display the background
-		SelectObject(hdc, back_pen);
-		SelectObject(hdc, back_brush);
-
-		Rectangle(hdc, x, y + brick_half_height - 3, x + AsConfig::Volume_Rectangle, y + brick_half_height);
-
-		// Display the foreground
-		SelectObject(hdc, front_pen);
-		SelectObject(hdc, front_brush);
-
-		Rectangle(hdc, x, y + brick_half_height , x + AsConfig::Volume_Rectangle, y + brick_half_height + 3);
-	}
-	else
-	{
-		SetGraphicsMode(hdc, GM_ADVANCED);
-
-		// Set up the letter "flip" matrix
-		xForm.eM11 = 1.0f;
-		xForm.eM12 = 0.0f;
-		xForm.eM21 = 0.0f;
-		xForm.eM22 = (float)cos(rotation_angle);
-		xForm.eDx  = (float)x;
-		xForm.eDy  = (float)y + (float)brick_half_height;
-
-		GetWorldTransform(hdc, &old_xForm);
-		SetWorldTransform(hdc, &xForm);
-
-		//	Deduced background
-		SelectObject(hdc, back_pen);
-		SelectObject(hdc, back_brush);
-
-		offset = (1.0 - fabs(xForm.eM22)) * 12;
-		back_part_offset = (int)round(offset);
-		RoundRect(hdc, 0, -brick_half_height - back_part_offset, AsConfig::Volume_Rectangle, brick_half_height - back_part_offset, 10, 32);
-
-		// Deduced foreground
-		SelectObject(hdc, front_pen);
-		SelectObject(hdc, front_brush);
-
-		RoundRect(hdc, 0, brick_half_height, AsConfig::Volume_Rectangle, -brick_half_height, 10, 32);
-
-		if (rotation_step > 4 && rotation_step <= 12)
-		{
-			if (letter_type == ELT_O)
-			{
-				SelectObject(hdc, Letter_Pen);
-				Ellipse(hdc, AsConfig::Circle_Size, -AsConfig::Y_Letter, AsConfig::Circle_Size * 2, AsConfig::Y_Letter);
-			}
-		}
-		SetWorldTransform(hdc, &old_xForm);
-	}
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool ALevel::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
-{
-	// Correction position when reflecting from the bricks
-	int i, j;
-
-	double direction;
-	double min_ball_x, max_ball_x;
-	double min_ball_y, max_ball_y;
-	int min_level_x, max_level_x;
-	int min_level_y, max_level_y;
-	bool horizon_got_hit, vertical_got_hit;
-	double horizon_reflect_pos, vertical_reflect_pos;
-
-	if (next_y_pos + ball->Radius > AsConfig::Level_Y_Offset + (AsConfig::Level_Height - 1) * AsConfig::Cell_Height + AsConfig::Brick_Height)
-		return false;
-
-	direction = ball -> Get_Direction();
-
-	min_ball_x = next_x_pos - ball -> Radius;
-	max_ball_x = next_x_pos + ball -> Radius;
-	min_ball_y = next_y_pos - ball -> Radius;
-	max_ball_y = next_y_pos + ball -> Radius;
-
-	min_level_x = (int)(min_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width;
-	max_level_x = (int)(max_ball_x - AsConfig::Level_X_Offset) / (double)AsConfig::Cell_Width;
-	min_level_y = (int)(min_ball_y - AsConfig::Level_Y_Offset) / (double)AsConfig::Cell_Height;
-	max_level_y = (int)(max_ball_y - AsConfig::Level_Y_Offset) / (double)AsConfig::Cell_Height;
-
-	for (i = max_level_y; i >= min_level_y; i--)
-	{
-		Current_Brick_Y_High = AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height;
-		Current_Brick_Y_Low =  Current_Brick_Y_High + AsConfig::Brick_Height;
-
-		for (j = min_level_x; j <= max_level_x; j++)
-		{
-			if (Current_Level[i][j] == 0)
-				continue;
-
-			Current_Brick_Left_X = AsConfig::Level_X_Offset + j * AsConfig::Cell_Width;
-			Current_Brick_Right_X = Current_Brick_Left_X + AsConfig::Brick_Width;
-
-			horizon_got_hit = Check_Horizontal_Hit(next_x_pos, next_y_pos, j, i, ball, horizon_reflect_pos);
-
-			vertical_got_hit = Check_Vertical_Hit(next_x_pos, next_y_pos, j, i, ball, vertical_reflect_pos);
-
-			if (horizon_got_hit && vertical_got_hit)
-			{
-				if (vertical_reflect_pos < horizon_reflect_pos)
-					ball -> Reflect(true);
-				else
-					ball -> Reflect(false);
-				Add_Active_Brick(j, i);
-				return true;
-			}
-			else
-				if (horizon_got_hit)
-				{
-					ball -> Reflect(false);
-					Add_Active_Brick(j, i);
-					return true;
-				}
-				else
-					if (vertical_got_hit)
-					{
-						ball -> Reflect(true);
-						Add_Active_Brick(j, i);
-						return true;
-					}
-		}
-	}
-	return false;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
