@@ -21,8 +21,8 @@ void AsBorder::Draw(HDC hdc, RECT &paint_area)
 	for (i = 0; i < 60; i++)
 		Draw_Element(hdc, magic_number2, magic_number1 + i * magic_number3, false);
 
-	// 2. Line border right					
-	for (i = 0; i < 60; i++)				
+	// 2. Line border right	
+	for (i = 0; i < 60; i++)
 		Draw_Element(hdc, magic_number4, magic_number1 + i * magic_number3, false);
 
 	// 3. Line top
