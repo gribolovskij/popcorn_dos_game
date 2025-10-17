@@ -2,10 +2,11 @@
 
 #include "Config.h"
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-enum Ebrick_Type
+enum EBrick_Type
 {
 	EBT_None,
-	EBT_Purple,
+
+	EBT_Yellow,
 	EBT_Blue,
 	EBT_Teleport,
 	EBT_Reklama,
@@ -13,12 +14,13 @@ enum Ebrick_Type
 	EBT_ThreeHits,
 	EBT_TwoHits,
 	EBT_Titan,
+	EBT_Pasachut
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class AAction_Brick
 {
 public:
-	AAction_Brick(Ebrick_Type brick_Type, int level_x, int level_y);
+	AAction_Brick(EBrick_Type brick_Type, int level_x, int level_y);
 
 	void Draw(HDC hdc, RECT& paint_area);
 	void Act();
@@ -26,7 +28,7 @@ public:
 	static void Setup_Colors();
 
 private:
-	Ebrick_Type brick_Type;
+	EBrick_Type brick_Type;
 
 	RECT brick_rect;
 	HPEN pen;

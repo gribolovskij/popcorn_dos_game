@@ -17,7 +17,6 @@ enum EKey_Type
 enum EGame_State
 {
 	EGS_Test_Mode,
-
 	EGS_Play_Level,
 	EGS_Missing_Ball,
 	EGS_Replay_Level

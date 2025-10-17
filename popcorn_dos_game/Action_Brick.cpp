@@ -7,8 +7,8 @@ HBRUSH AAction_Brick::Fading_Blue_Brick_Brushes[Fade_Brick_Step];
 HPEN AAction_Brick::Fading_Purple_Brick_Pens[Fade_Brick_Step];
 HBRUSH AAction_Brick::Fading_Purple_Brick_Brushes[Fade_Brick_Step];
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-AAction_Brick::AAction_Brick(Ebrick_Type brick_Type, int level_x, int level_y)
-	: Fade_Brick(0), brick_rect{}, brick_Type(brick_Type), brush{}, pen{}
+AAction_Brick::AAction_Brick(EBrick_Type brick_Type, int level_x, int level_y)
+	: Fade_Brick(0), brick_rect{}, brick_Type(brick_Type)
 {
 		brick_rect.left = AsConfig::Level_X_Offset + level_x * AsConfig::Cell_Width;
 		brick_rect.top = AsConfig::Level_Y_Offset + level_y * AsConfig::Cell_Height;
@@ -33,7 +33,7 @@ void AAction_Brick::Draw(HDC hdc, RECT& paint_area)
 	brush = Fading_Blue_Brick_Brushes[Fade_Brick];
 	break;
 
-	case EBT_Purple: 
+	case EBT_Yellow: 
 	pen = Fading_Purple_Brick_Pens[Fade_Brick];
 	brush = Fading_Purple_Brick_Brushes[Fade_Brick];
 	break;
