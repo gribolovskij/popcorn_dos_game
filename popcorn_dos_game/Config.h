@@ -41,7 +41,6 @@ public:
 
 	static const double Step_Move;
 
-	static const int Global_Scale = 1;
 	static const int Circle_Size = 20;
 	static const int Volume_Rectangle = 59; 
 	static const int Y_Letter = 8;

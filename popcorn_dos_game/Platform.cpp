@@ -158,7 +158,7 @@ void AsPlatform::Draw(HDC hdc, RECT& paint_area)
 void AsPlatform::Draw_Highlight(HDC hdc, int x, int y)
 {
 SelectObject(hdc, Arc_Pen);
-Arc	(hdc, x + AsConfig::Level_Y_Offset, y + AsConfig::Level_Y_Offset, x + AsConfig::Ball_X_Offset, y + 2, x + 10, y - AsConfig::Brick_Width, x - 121, y - AsConfig::Brick_Width);
+Arc	(hdc, x + AsConfig::Level_Y_Offset, y + AsConfig::Level_Y_Offset, x + AsConfig::Ball_X_Offset - 1, y + 2 - 1, x + 10, y - AsConfig::Brick_Width, x - 121, y - AsConfig::Brick_Width);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Clear_BG(HDC hdc)
@@ -182,15 +182,15 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT& paint_area)
 	SelectObject(hdc, Platform_Circle_Pen);
 	SelectObject(hdc, Platform_Circle_Brush);
 
-	Ellipse(hdc, x, y, x + AsConfig::Circle_Size * AsConfig::Global_Scale, y + AsConfig::Circle_Size * AsConfig::Global_Scale);
+	Ellipse(hdc, x, y, x + AsConfig::Circle_Size - 1, y + AsConfig::Circle_Size - 1);
 
-	Ellipse(hdc, x + (AsConfig::Circle_Size + Inner_Width), y, x + ((AsConfig::Circle_Size*2)+Inner_Width), y + AsConfig::Circle_Size);
+	Ellipse(hdc, x + (AsConfig::Circle_Size + Inner_Width), y, x + ((AsConfig::Circle_Size*2)+Inner_Width) - 1, y + AsConfig::Circle_Size - 1);
 
 	// 2. Drawing inner part
 	SelectObject(hdc, Platform_Inner_Pen);
 	SelectObject(hdc, Platform_Inner_Brush);
 
-	RoundRect(hdc, x+9, y+18, x + (Inner_Width + 31), y + AsConfig::Global_Scale*2, 10 * AsConfig::Global_Scale, 32 * AsConfig::Global_Scale);
+	RoundRect(hdc, x+9, y+18, x + (Inner_Width + 31), y + 2, 10, 32);
 
 	// 3. Drawing highlight
 	Draw_Highlight(hdc, x, y);
@@ -208,8 +208,9 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 	COLORREF pixel;
 	COLORREF bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
 
-	area_width = Width * AsConfig::Global_Scale;
-	area_height = Height * AsConfig::Global_Scale + 1;
+	area_width = Width;
+	// Create Height, maybe Height * 2
+	area_height = Height;
 
 	max_platform_y = AsConfig::Max_Y_Pos + area_height;
 
@@ -251,15 +252,14 @@ void AsPlatform::Draw_Roll_State(HDC hdc, RECT& paint_area)
 	XFORM xForm, old_xForm;
 
 	Clear_BG(hdc);
-
+	
 	// 1. Draw Ball
 	SelectObject(hdc, Platform_Circle_Pen);
 	SelectObject(hdc, Platform_Circle_Brush);
 
-	Ellipse(hdc, x, y, x + roller_size, y + roller_size);
+	Ellipse(hdc, x, y, x + roller_size - 1, y + roller_size - 1);
 
 	// 2. Draw line border ball and rotate 30 degrees counterclockwise.
-	SetGraphicsMode(hdc, GM_ADVANCED);
 
 	alpha = -2.0 * M_PI / (double)Max_Roll_Step * (double)Roll_Step;
 
@@ -276,7 +276,7 @@ void AsPlatform::Draw_Roll_State(HDC hdc, RECT& paint_area)
 	SelectObject(hdc, AsConfig::BG_Pen);
 	SelectObject(hdc, AsConfig::BG_Brush);
 
-	Rectangle(hdc, -3 / 2, -roller_size / 2, 3 / 2 - 1, roller_size / 2); 
+	Rectangle(hdc, -3 / 2, -roller_size / 2, 3 / 2 - 1 - 1, roller_size / 2 - 1);
 
 	SetWorldTransform(hdc, &old_xForm);
 

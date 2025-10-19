@@ -25,16 +25,17 @@ public:
 	void Draw(HDC hdc, RECT& paint_area);
 	void Act();
 	bool Is_Finished();
+
 	static void Setup_Colors();
 
 private:
 	EBrick_Type brick_Type;
 
+	int Fade_Brick;
+
 	RECT brick_rect;
 	HPEN pen;
 	HBRUSH brush;
-
-	int Fade_Brick;
 
 	static unsigned char Get_Fading_Channel_Color(unsigned char color, unsigned char bg_color, int step);
 	static void Get_Fading_Color(const AColor &color, int step, HPEN &pen, HBRUSH &brush);

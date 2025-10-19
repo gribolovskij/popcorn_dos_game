@@ -23,7 +23,7 @@ bool AHit_Checker::Hit_Circle_Line(double y, double left_x, double right_x, doub
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const double ABall::Start_Ball_Y_Pos = 536.0;
-const double ABall::Radius = 7 - 0.5;
+const double ABall::Radius = 5 - 0.5;
 int ABall::Count_Hit_Checkers = 0;
 AHit_Checker *ABall::Hit_Checkers[] = {};
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -43,24 +43,28 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
-	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect))			// Cheking The Field Coloring After The Ball
+	//	1. Clean background
+// Cheking The Field Coloring After The Ball
+	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Ball_Rect))
 	{
-//	1. Clean background
-	SelectObject(hdc, AsConfig::BG_Pen);
-	SelectObject(hdc, AsConfig::BG_Brush);
+		SelectObject(hdc, AsConfig::BG_Pen);
+		SelectObject(hdc, AsConfig::BG_Brush);
 
-	Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right, Prev_Ball_Rect.bottom);
+		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
 	}
 
 	if (Ball_State == EBS_Missing)
 		return;
-	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect))		// Cheking The Field Coloring After The Ball
+
+	// Cheking The Field Coloring After The Ball
+	if (IntersectRect(&intersection_rect, &paint_area, &Ball_Rect))
 	{
+
 //	2. Draw ball
 	SelectObject(hdc, Ball_Pen);
 	SelectObject(hdc, Ball_Brush);
 
-	Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right, Ball_Rect.bottom);
+	Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right - 1, Ball_Rect.bottom - 1);
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

@@ -42,7 +42,7 @@ void AAction_Brick::Draw(HDC hdc, RECT& paint_area)
 	SelectObject(hdc, pen);
 	SelectObject(hdc, brush);
 
-	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right, brick_rect.bottom, 10 * AsConfig::Global_Scale, 32 * AsConfig::Global_Scale);
+	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right, brick_rect.bottom, 10, 32);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AAction_Brick::Act()

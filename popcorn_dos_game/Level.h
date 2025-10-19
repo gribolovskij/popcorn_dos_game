@@ -13,13 +13,27 @@ enum ELetter_Type
 class AFalling_Letter
 {
 public:
-	AFalling_Letter(ELetter_Type letter_type);
+	AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y);
+
+	void Act();
+	void Draw(HDC hdc, RECT& paint_area);
+	bool Is_Finished();
 
 	const ELetter_Type Letter_Type;
+	const EBrick_Type Brick_Type;
+
+	bool Got_Hit;
 
 private:
+	RECT Letter_Cell, Prev_Letter_Cell;
+	int X, Y;
+	int Rotation_Step;
+	int Next_Rotation_Tick;
+
+	static const int Tick_Per_Step = 4;
+
 	void Set_Brick_Letter_Colors(bool is_switch_color, HPEN& front_pen, HBRUSH& front_brush, HPEN& back_pen, HBRUSH& back_brush);
-	void Draw_Brick_Letter(HDC hdc, int x, int y, EBrick_Type brick_type, ELetter_Type letter_type, int rotation_step);
+	void Draw_Brick_Letter(HDC hdc);
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class ALevel: public AHit_Checker
@@ -38,6 +52,7 @@ public:
 	static char Test_Level[AsConfig::Level_Height][AsConfig::Level_Width];
 
 	RECT Level_Rect;
+
 
 private:
 	bool Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type);
@@ -60,5 +75,6 @@ private:
 
 	int Falling_Brick_Count;
 	AFalling_Letter *Falling_Letter[AsConfig::Max_Falling_Letter_Count];
+
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
