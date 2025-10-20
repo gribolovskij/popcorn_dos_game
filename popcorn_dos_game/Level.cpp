@@ -3,12 +3,12 @@
 
 // AFalling_Letter
 AFalling_Letter::AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y)
-	: Brick_Type(brick_type), Letter_Type(letter_type), X(x), Y(y), Got_Hit(false), Rotation_Step(0), Next_Rotation_Tick(AsConfig::Tick_Current_Timer + Tick_Per_Step)
+	: Brick_Type(brick_type), Letter_Type(letter_type), X(x), Y(y), Got_Hit(false), Rotation_Step(2), Next_Rotation_Tick(AsConfig::Tick_Current_Timer + Tick_Per_Step)
 {
 	Letter_Cell.left = X;
-	Letter_Cell.right = Y;
-	Letter_Cell.top = Letter_Cell.left + AsConfig::Brick_Width;
-	Letter_Cell.bottom = Letter_Cell.right + AsConfig::Brick_Height;
+	Letter_Cell.top = Y;
+	Letter_Cell.right = Letter_Cell.left + AsConfig::Brick_Width;
+	Letter_Cell.bottom = Letter_Cell.top + AsConfig::Brick_Height;
 
 	Prev_Letter_Cell = Letter_Cell;
 }
@@ -32,7 +32,7 @@ void AFalling_Letter::Act()
 	InvalidateRect(AsConfig::Hwnd, &Letter_Cell, FALSE);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void AFalling_Letter::Draw(HDC hdc, RECT& paint_area)
+void AFalling_Letter::Draw(HDC hdc, RECT &paint_area)
 {
 	RECT intersection_rect;
 
@@ -317,23 +317,27 @@ bool ALevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type
 	int i;
 	int letter_x, letter_y;
 
-	AFalling_Letter* falling_letter;
+	AFalling_Letter *falling_letter;
 
 	if (brick_type == EBT_Yellow || brick_type == EBT_Blue)
 	{
-		if (AsConfig::Rand(AsConfig::Max_Action_Brick_Count) >= 0)
+		if (AsConfig::Rand(AsConfig::Hits_Per_Letter) == 0)
 		{
-			if (Falling_Brick_Count < AsConfig::Max_Action_Brick_Count)
+			if (Falling_Brick_Count < AsConfig::Max_Falling_Letter_Count)
 			{
-				for (i = 0; i < AsConfig::Max_Action_Brick_Count; i++)
+				for (i = 0; i < AsConfig::Max_Falling_Letter_Count; i++)
 				{
-					letter_x = brick_x * AsConfig::Brick_Width;  // + AsConfig::Level_X_Offset
-					letter_y = brick_y * AsConfig::Brick_Height ;  // + AsConfig::Level_Y_Offset
-					falling_letter = new AFalling_Letter(brick_type, ELT_O, letter_x, letter_y);
+					if (Falling_Letter[i] == 0)
+					{
+						letter_x = brick_x * AsConfig::Brick_Width;  // + AsConfig::Level_X_Offset
+						letter_y = brick_y * AsConfig::Brick_Height ;  // + AsConfig::Level_Y_Offset
 
-					Falling_Letter[i] = falling_letter;
-					++Falling_Brick_Count;
-					break;
+						falling_letter = new AFalling_Letter(brick_type, ELT_O, letter_x, letter_y);
+
+						Falling_Letter[i] = falling_letter;
+						++Falling_Brick_Count;
+						break;
+					}
 				}
 			}
 			return true;
