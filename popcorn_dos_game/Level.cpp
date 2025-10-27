@@ -17,9 +17,9 @@ void AFalling_Letter::Act()
 {
 	Prev_Letter_Cell = Letter_Cell;
 
-	Y += 3;
-	Letter_Cell.top += 3;
-	Letter_Cell.bottom += 3;
+	Y += 5;
+	Letter_Cell.top += 5;
+	Letter_Cell.bottom += 5;
 
 
 	if (AsConfig::Tick_Current_Timer >= Next_Rotation_Tick)
@@ -329,8 +329,8 @@ bool ALevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type
 				{
 					if (Falling_Letter[i] == 0)
 					{
-						letter_x = brick_x * AsConfig::Brick_Width;  // + AsConfig::Level_X_Offset
-						letter_y = brick_y * AsConfig::Brick_Height ;  // + AsConfig::Level_Y_Offset
+						letter_y = brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset;
+						letter_x = brick_x * AsConfig::Cell_Width + AsConfig::Level_X_Offset;
 
 						falling_letter = new AFalling_Letter(brick_type, ELT_O, letter_x, letter_y);
 
