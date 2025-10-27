@@ -329,8 +329,8 @@ bool ALevel::Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type
 				{
 					if (Falling_Letter[i] == 0)
 					{
-						letter_y = brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset;
 						letter_x = brick_x * AsConfig::Cell_Width + AsConfig::Level_X_Offset;
+						letter_y = brick_y * AsConfig::Cell_Height + AsConfig::Level_Y_Offset;
 
 						falling_letter = new AFalling_Letter(brick_type, ELT_O, letter_x, letter_y);
 
