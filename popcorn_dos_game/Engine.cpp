@@ -36,20 +36,42 @@ void AsEngine::Init(HWND hwnd)
 void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 //	Drawing screen game
 {
-	SetGraphicsMode(hdc, GM_ADVANCED);
+	//int i;
+
+ 	SetGraphicsMode(hdc, GM_ADVANCED);
 
 	Level.Draw(hdc, paint_area);
 	Border.Draw(hdc, paint_area);
 	Platform.Draw(hdc, paint_area);
 	Ball.Draw(hdc, paint_area);
 
-	/*int i;
-	for (i = 0; i < 16; i++)
-	{
-		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 200, EBT_Blue, ELT_O, i);
-		Draw_Brick_Letter(hdc, 200 + i * Brick_Width, 130, EBT_Yellow, ELT_O, i);
+	// test speed redraw platform_meltdown
+	 
+	/*COLORREF pixel;
+	for (i = 0; i < 81 * 22 * 10; i++)
+	{ 
+		pixel = GetPixel(hdc, 100, 100);
+		SetPixel(hdc, 100, 100, pixel);  
 	}*/
+
+	 // test speed redram - 2
+
+	/*for(i=0; i<81 * 1000; i++)
+	{
+	MoveToEx(hdc, 100, 555, 0);
+	SelectObject(hdc, AsConfig::BG_Pen);
+	LineTo(hdc, 100, 557);
+
+	SelectObject(hdc, AsConfig::Brick_Purple_Pen);
+	LineTo(hdc, 100, 572);
+
+	SelectObject(hdc, AsConfig::BG_Pen);
+	LineTo(hdc, 100, 577);
+	}
+	int yy = 0*/
+
 }
+	
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Key_Down(EKey_Type key_type)
 {

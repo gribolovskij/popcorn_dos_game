@@ -205,7 +205,7 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 	int moved_col_count = 0;
 	int max_platform_y;
 
-	COLORREF pixel;
+		COLORREF pixel;
 	COLORREF bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
 
 	area_width = Width;

@@ -23,7 +23,7 @@ bool AHit_Checker::Hit_Circle_Line(double y, double left_x, double right_x, doub
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const double ABall::Start_Ball_Y_Pos = 536.0;
-const double ABall::Radius = 5 - 0.5;
+const double ABall::Radius = 6;
 int ABall::Count_Hit_Checkers = 0;
 AHit_Checker *ABall::Hit_Checkers[] = {};
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -50,7 +50,7 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 		SelectObject(hdc, AsConfig::BG_Pen);
 		SelectObject(hdc, AsConfig::BG_Brush);
 
-		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right - 1, Prev_Ball_Rect.bottom - 1);
+		Ellipse(hdc, Prev_Ball_Rect.left, Prev_Ball_Rect.top, Prev_Ball_Rect.right-1, Prev_Ball_Rect.bottom-1);
 	}
 
 	if (Ball_State == EBS_Missing)
@@ -64,7 +64,7 @@ void ABall::Draw(HDC hdc, RECT &paint_area)
 	SelectObject(hdc, Ball_Pen);
 	SelectObject(hdc, Ball_Brush);
 
-	Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right - 1, Ball_Rect.bottom - 1);
+	Ellipse(hdc, Ball_Rect.left, Ball_Rect.top, Ball_Rect.right-1, Ball_Rect.bottom-1);
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -143,7 +143,7 @@ void ABall::Set_State(EBall_State new_state, double x_pos, double y_pos)
 	case EBS_Normal:
 		Center_X_Pos = x_pos;
 		Center_Y_Pos = y_pos;
-		Ball_Speed = 8.0;
+		Ball_Speed = 7.0;
 		Rest_Distance = 0.0;
 		Ball_Direction = M_PI_4;
 		Redraw_Ball();
@@ -220,12 +220,16 @@ void ABall::Add_Hit_Checkers(AHit_Checker *hit_checker)
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ABall::Redraw_Ball()
 {
-	Ball_Rect.left   =(int) (Center_X_Pos - Radius);
-	Ball_Rect.top    =(int) (Center_Y_Pos - Radius);
-	Ball_Rect.right  =(int) (Center_X_Pos + Radius);
-	Ball_Rect.bottom =(int) (Center_Y_Pos + Radius);
+	Ball_Rect.left   = (int) (Center_X_Pos - Radius);
+	Ball_Rect.top    = (int) (Center_Y_Pos - Radius);
+	Ball_Rect.right  = (int) (Center_X_Pos + Radius);
+	Ball_Rect.bottom = (int) (Center_Y_Pos + Radius);
 
-	InvalidateRect(AsConfig::Hwnd, &Prev_Ball_Rect, FALSE);
-	InvalidateRect(AsConfig::Hwnd, &Ball_Rect, FALSE);
+
+	RECT update_rect;
+	UnionRect(&update_rect, &Prev_Ball_Rect, &Ball_Rect);
+	InvalidateRect(AsConfig::Hwnd, &update_rect, FALSE);
+	//InvalidateRect(AsConfig::Hwnd, &Prev_Ball_Rect, FALSE);
+	//InvalidateRect(AsConfig::Hwnd, &Ball_Rect, FALSE);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
