@@ -2,9 +2,15 @@
 
 // AsPlatform
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+AsPlatform::~AsPlatform()
+{
+	delete[] Image_Normal_Platform;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AsPlatform::AsPlatform()
-	: X_Pos(AsConfig::Border_X_Offset), Width(Width_Normal), Inner_Width(Normal_Inner_Width), Arc_Pen(0), Arc_Brush(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), 
-	Platform_State(EPS_Normal), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Platform_Y_Pos{}, Roll_Step(0)
+	: X_Pos(AsConfig::Border_X_Offset), Width(Width_Normal), Inner_Width(Normal_Inner_Width), Arc_Pen(0), Arc_Brush(0), Image_Normal_Width(0), Image_Normal_Height(0), Image_Normal_Platform(0), Platform_Circle_Pen(0), Platform_Inner_Pen(0), 
+	Platform_State(EPS_Normal), Platform_Circle_Brush(0), Platform_Inner_Brush(0), Platform_Rect{}, Prev_Platform_Rect{}, Meltdown_Platform_Y_Pos{}, Roll_Step(0),
+	Platform_Circle_Pen_Color(155, 0, 0), Platform_Inner_Pen_Color(249, 100, 0), Arc_Pen_Color(255, 255, 255)
 {
 	X_Pos = (AsConfig::Max_X_Pos - Width) / 2;
 }
@@ -12,7 +18,7 @@ AsPlatform::AsPlatform()
 bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 {
 	double reflect_pos;
-	double inner_left_x, inner_right_x;
+	double inner_left_x, inner_right_x; 
 	double inner_top_y, inner_low_y;
 	double inner_y;
 
@@ -55,6 +61,10 @@ void AsPlatform::Init()
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Act()
 {
+/*
+	if (AsConfig::Tick_Current_Timer % 10 != 0)
+		return; TEST ANIMATIONS
+*/
 	switch (Platform_State)
 	{
 		case EPS_Meltdown:
@@ -172,6 +182,9 @@ void AsPlatform::Clear_BG(HDC hdc)
 void AsPlatform::Draw_Normal_State(HDC hdc, RECT& paint_area)
 //	Drawing platform for normal state
 {
+	int i, j;
+	int offset = 0;
+
 	int x = X_Pos ;
 	int y = AsConfig::Platform_Y_Pos;
 
@@ -194,26 +207,45 @@ void AsPlatform::Draw_Normal_State(HDC hdc, RECT& paint_area)
 
 	// 3. Drawing highlight
 	Draw_Highlight(hdc, x, y);
-}		
+
+	x *= AsConfig::Global_Scale;
+	y *= AsConfig::Global_Scale;
+
+	if (Image_Normal_Platform == 0)
+	{
+		Image_Normal_Width = Width * AsConfig::Global_Scale;
+		Image_Normal_Height = Height * AsConfig::Global_Scale;
+
+		Image_Normal_Platform= new int [Image_Normal_Width * Image_Normal_Height];
+		for (i = 0; i < Image_Normal_Height; i++)
+			for (j = 0; j < Image_Normal_Width; j++)
+
+				Image_Normal_Platform[offset++] = GetPixel(hdc, x + j, y + i);
+	}
+}
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 //	Drawing platform for meltdown state
 {	int i, j;
 	int y_offset;
+
 	int x, y;
 	int area_width, area_height;
 	int moved_col_count = 0;
 	int max_platform_y;
+	int stroke_len;
 
-		COLORREF pixel;
+	HPEN color_pen;
+	COLORREF pixel;
 	COLORREF bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
 
 	area_width = Width;
+
 	// Create Height, maybe Height * 2
 	area_height = Height;
 
 	max_platform_y = AsConfig::Max_Y_Pos + area_height;
-
+	
 	for (i = 0; i < area_width; i++)
 	{
 		if(Meltdown_Platform_Y_Pos[i] > max_platform_y)
@@ -222,25 +254,95 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 
 		y_offset = AsConfig::Rand(Meltdown_Speed) + 1;
 		x = Platform_Rect.left + i;
+		
+		//for (j = 0; j < area_height; j++)
+		//{
+		//	y = Meltdown_Platform_Y_Pos[i] - j;
 
-		for (j = 0; j < area_height; j++)
+		//	pixel = GetPixel(hdc, x, y);
+		//	SetPixel(hdc, x, y + y_offset, pixel);
+		//}
+
+		//for (j = 0; j < y_offset; j++)
+		//{
+		//	y = Meltdown_Platform_Y_Pos[i] - area_height + 1 + j;
+		//	SetPixel(hdc, x, y, bg_pixel);
+		//}
+
+		
+	j = 0;
+	y = Meltdown_Platform_Y_Pos[i] - area_height;
+
+	MoveToEx(hdc, x, y, 0);
+
+	while (Get_Platform_Image_Stroke_Color(i, j, color_pen, stroke_len) )
+
 		{
-			y = Meltdown_Platform_Y_Pos[i] - j;
+			SelectObject(hdc, color_pen);
 
-			pixel = GetPixel(hdc, x, y);
-			SetPixel(hdc, x, y + y_offset, pixel);
+			LineTo(hdc, x, y + stroke_len);
+
+			y += stroke_len;
+			j += stroke_len;
 		}
 
-		for (j = 0; j < y_offset; j++)
-		{
-			y = Meltdown_Platform_Y_Pos[i] - area_height + 1 + j;
-			SetPixel(hdc, x, y, bg_pixel);
-		}
-		Meltdown_Platform_Y_Pos[i] += y_offset;
+	// Clean BG after Meltdown_Platform
+	y = Meltdown_Platform_Y_Pos[i] - area_height;
+	MoveToEx(hdc, x, y, 0);
+	SelectObject(hdc, AsConfig::BG_Pen);
+	LineTo(hdc, x, y + y_offset);
+	Meltdown_Platform_Y_Pos[i] += y_offset;
+
 	}
 
 	if (moved_col_count == 0)
 		Platform_State = EPS_Missing;		// The platform has been moved beyond the window border.
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, HPEN &color_pen, int &stroke_len)
+{
+	int i = 0;
+	int offset = y * Image_Normal_Width + x;	// Position in massiv Image_Normal_Platform == offset x, y
+
+	int color;
+	stroke_len = 0;
+
+
+	if (y >= Image_Normal_Height)
+		return false;
+
+	for (i = y; i < Image_Normal_Height; i++)
+	{
+		if (i == y)
+		{
+			color = Image_Normal_Platform[offset];
+			stroke_len = 1;
+		}
+
+		else
+			if (color == Image_Normal_Platform[offset])
+				++stroke_len;
+
+			else
+				break;
+
+		offset += Image_Normal_Width;
+	}
+	
+	if (color == Platform_Circle_Pen_Color.Get_RGB() )
+		color_pen = Platform_Circle_Pen;
+
+	else if (color == Platform_Inner_Pen_Color.Get_RGB() )
+		color_pen = Platform_Inner_Pen;
+
+	else if (color == Arc_Pen_Color.Get_RGB() )
+		color_pen = Arc_Pen;
+
+	else if (color == AsConfig::BG_Color.Get_RGB() )
+		color_pen = AsConfig::BG_Pen;
+
+
+	return true;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Roll_State(HDC hdc, RECT& paint_area)

@@ -10,8 +10,10 @@
 class AColor
 {
 public:
-	AColor(unsigned  char r, unsigned  char g, unsigned  char b);
-	
+	AColor(unsigned char r, unsigned char g, unsigned char b);
+
+	int Get_RGB() const;
+
 	unsigned char R, G, B;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -21,35 +23,36 @@ public:
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class AsConfig
 {
-public: 
+public:
 	static void Setup_Colors();
-	static void Create_Pen_Brush(unsigned  char r, unsigned  char g, unsigned  char b, HPEN& pen, HBRUSH& brush);
+	static void Create_Pen_Brush(unsigned char r, unsigned char g, unsigned char b, HPEN& pen, HBRUSH& brush);
 	static void Create_Pen_Brush(const AColor &color, HPEN& pen, HBRUSH& brush);
 	static int Rand(int range);
 
 
 	static bool Level_Has_Floor;
-	static int 	Tick_Current_Timer;
+	static int Tick_Current_Timer;
 	static const AColor Gray_Brick_Color, Orange_Brick_Color, BG_Color;
 	static HPEN BG_Pen;
 	static HBRUSH BG_Brush;
 
-	static HPEN Purple_Brick_Pen, Blue_Brick_Pen,  Letter_Pen;
+	static HPEN Purple_Brick_Pen, Blue_Brick_Pen, Letter_Pen;
 	static HBRUSH Purple_Brick_Brush, Blue_Brick_Brush;
 
 	static HWND Hwnd;
 
 	static const double Step_Move;
 
+	static const int Global_Scale = 1;
 	static const int Circle_Size = 20;
-	static const int Volume_Rectangle = 59; 
+	static const int Volume_Rectangle = 59;
 	static const int Y_Letter = 8;
 	static const int Level_Height = 14;		// Height brick
 	static const int Level_Width = 12;		// Width brick
 	static const int Level_X_Offset = 23;		// Position start level
 	static const int Level_Y_Offset = 13;		// Position start level
 	static const int Brick_Width = 61;
-	static const int Brick_Height = 23; 
+	static const int Brick_Height = 23;
 	static const int Cell_Width = 64;
 	static const int Cell_Height = 26;
 	static const int Max_X_Pos = (Level_X_Offset + Cell_Width * Level_Width);
