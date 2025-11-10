@@ -54,9 +54,9 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Init()
 {
-	AsConfig::Create_Pen_Brush(155, 0, 0, Platform_Circle_Pen, Platform_Circle_Brush);
-	AsConfig::Create_Pen_Brush(249, 100, 0, Platform_Inner_Pen, Platform_Inner_Brush);
-	AsConfig::Create_Pen_Brush(255, 255, 255, Arc_Pen, Arc_Brush);
+	AsConfig::Create_Pen_Brush(Platform_Circle_Pen_Color, Platform_Circle_Pen, Platform_Circle_Brush);
+	AsConfig::Create_Pen_Brush(Platform_Inner_Pen_Color, Platform_Inner_Pen, Platform_Inner_Brush);
+	AsConfig::Create_Pen_Brush(Arc_Pen_Color, Arc_Pen, Arc_Brush);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Act()
@@ -93,7 +93,7 @@ void AsPlatform::Set_State(EPlatform_State new_state)
 				len = sizeof(Meltdown_Platform_Y_Pos) / sizeof(Meltdown_Platform_Y_Pos[0]);
 
 		for (i = 0; i < len; i++)
-			Meltdown_Platform_Y_Pos[i] = AsConfig::Platform_Y_Pos + Height;
+			Meltdown_Platform_Y_Pos[i] = Platform_Rect.top;
 	break;
 
 
@@ -230,7 +230,6 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 	int y_offset;
 
 	int x, y;
-	int area_width, area_height;
 	int moved_col_count = 0;
 	int max_platform_y;
 	int stroke_len;
@@ -239,14 +238,9 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 	COLORREF pixel;
 	COLORREF bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
 
-	area_width = Width;
-
-	// Create Height, maybe Height * 2
-	area_height = Height;
-
-	max_platform_y = AsConfig::Max_Y_Pos + area_height;
+	max_platform_y = AsConfig::Max_Y_Pos + 3; 
 	
-	for (i = 0; i < area_width; i++)
+	for (i = 0; i < Image_Normal_Width; i++)
 	{
 		if(Meltdown_Platform_Y_Pos[i] > max_platform_y)
 			continue;
@@ -255,26 +249,12 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 		y_offset = AsConfig::Rand(Meltdown_Speed) + 1;
 		x = Platform_Rect.left + i;
 		
-		//for (j = 0; j < area_height; j++)
-		//{
-		//	y = Meltdown_Platform_Y_Pos[i] - j;
-
-		//	pixel = GetPixel(hdc, x, y);
-		//	SetPixel(hdc, x, y + y_offset, pixel);
-		//}
-
-		//for (j = 0; j < y_offset; j++)
-		//{
-		//	y = Meltdown_Platform_Y_Pos[i] - area_height + 1 + j;
-		//	SetPixel(hdc, x, y, bg_pixel);
-		//}
-
-		
 	j = 0;
-	y = Meltdown_Platform_Y_Pos[i] - area_height;
+	y = Meltdown_Platform_Y_Pos[i];
 
 	MoveToEx(hdc, x, y, 0);
 
+	// Drawing subsequence vertical strokes different colors.
 	while (Get_Platform_Image_Stroke_Color(i, j, color_pen, stroke_len) )
 
 		{
@@ -287,7 +267,8 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 		}
 
 	// Clean BG after Meltdown_Platform
-	y = Meltdown_Platform_Y_Pos[i] - area_height;
+
+	y = Meltdown_Platform_Y_Pos[i];
 	MoveToEx(hdc, x, y, 0);
 	SelectObject(hdc, AsConfig::BG_Pen);
 	LineTo(hdc, x, y + y_offset);
@@ -296,53 +277,8 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 	}
 
 	if (moved_col_count == 0)
-		Platform_State = EPS_Missing;		// The platform has been moved beyond the window border.
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, HPEN &color_pen, int &stroke_len)
-{
-	int i = 0;
-	int offset = y * Image_Normal_Width + x;	// Position in massiv Image_Normal_Platform == offset x, y
-
-	int color;
-	stroke_len = 0;
-
-
-	if (y >= Image_Normal_Height)
-		return false;
-
-	for (i = y; i < Image_Normal_Height; i++)
-	{
-		if (i == y)
-		{
-			color = Image_Normal_Platform[offset];
-			stroke_len = 1;
-		}
-
-		else
-			if (color == Image_Normal_Platform[offset])
-				++stroke_len;
-
-			else
-				break;
-
-		offset += Image_Normal_Width;
-	}
-	
-	if (color == Platform_Circle_Pen_Color.Get_RGB() )
-		color_pen = Platform_Circle_Pen;
-
-	else if (color == Platform_Inner_Pen_Color.Get_RGB() )
-		color_pen = Platform_Inner_Pen;
-
-	else if (color == Arc_Pen_Color.Get_RGB() )
-		color_pen = Arc_Pen;
-
-	else if (color == AsConfig::BG_Color.Get_RGB() )
-		color_pen = AsConfig::BG_Pen;
-
-
-	return true;
+		// The platform has been moved beyond the window border.
+		Platform_State = EPS_Missing;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Roll_State(HDC hdc, RECT& paint_area)
@@ -464,5 +400,51 @@ bool AsPlatform::Reflect_Platform_Circle(double next_x_pos, double next_y_pos, d
 		}
 	}
 	return false;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool AsPlatform::Get_Platform_Image_Stroke_Color(int x, int y, HPEN &color_pen, int &stroke_len)
+{
+	int i = 0;
+	int offset = y * Image_Normal_Width + x;	// Position in massiv Image_Normal_Platform == offset x, y
+
+	int color;
+	stroke_len = 0;
+
+
+	if (y >= Image_Normal_Height)
+		return false;
+
+	for (i = y; i < Image_Normal_Height; i++)
+	{
+		if (i == y)
+		{
+			color = Image_Normal_Platform[offset];
+			stroke_len = 1;
+		}
+
+		else
+			if (color == Image_Normal_Platform[offset])
+				++stroke_len;
+
+			else
+				break;
+
+		offset += Image_Normal_Width;
+	}
+
+	if (color == Platform_Circle_Pen_Color.Get_RGB() )
+		color_pen = Platform_Circle_Pen;
+
+	else if (color == Platform_Inner_Pen_Color.Get_RGB() )
+		color_pen = Platform_Inner_Pen;
+
+	else if (color == Arc_Pen_Color.Get_RGB() )
+		color_pen = Arc_Pen;
+
+	else if (color == AsConfig::BG_Color.Get_RGB() )
+		color_pen = AsConfig::BG_Pen;
+
+
+	return true;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
