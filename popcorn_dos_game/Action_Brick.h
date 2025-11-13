@@ -17,14 +17,33 @@ enum EBrick_Type
 	EBT_Pasachut
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class AAction_Brick
+//
+//
+//
+//-------------------class AGraphics_Object
+//
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class AGraphics_Object
+{
+	virtual void Draw(HDC hdc, RECT& paint_area) = 0;
+	virtual void Act() = 0;
+	virtual bool Is_Finished() = 0;
+};
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//
+//
+//-------------------class AAction_Brick
+//
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class AAction_Brick: public AGraphics_Object
 {
 public:
 	AAction_Brick(EBrick_Type brick_Type, int level_x, int level_y);
 
-	void Draw(HDC hdc, RECT& paint_area);
-	void Act();
-	bool Is_Finished();
+	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual void Act();
+	virtual bool Is_Finished();
 
 	static void Setup_Colors();
 

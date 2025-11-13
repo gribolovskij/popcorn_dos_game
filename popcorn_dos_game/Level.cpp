@@ -1,7 +1,9 @@
 #include "Level.h"
 #include "Config.h"
 
-// AFalling_Letter
+//-------------------AFalling_Letter
+// 
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AFalling_Letter::AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y)
 	: Brick_Type(brick_type), Letter_Type(letter_type), X(x), Y(y), Got_Hit(false), Rotation_Step(2), Next_Rotation_Tick(AsConfig::Tick_Current_Timer + Tick_Per_Step)
 {
@@ -174,7 +176,8 @@ void AFalling_Letter::Set_Brick_Letter_Colors(bool is_switch_color, HPEN& front_
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 
-// ALevel
+//-------------------ALevel
+// 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 char ALevel::Level_01[AsConfig::Level_Height][AsConfig::Level_Width] =
 {
@@ -270,14 +273,24 @@ void ALevel::Act()
 void ALevel::Draw(HDC hdc, RECT& paint_area)
 {
 	int i, j;
-	RECT intersection_rect;
+	RECT intersection_rect, brick_rect;
 
 	if (IntersectRect(&intersection_rect, &paint_area, &Level_Rect))
 	{
 
 		for (i = 0; i < AsConfig::Level_Height; i++)
 			for (j = 0; j < AsConfig::Level_Width; j++)
-				Draw_Brick(hdc, AsConfig::Level_X_Offset + j * AsConfig::Cell_Width, AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height, (EBrick_Type)Current_Level[i][j]);
+
+					brick_rect.left = AsConfig::Level_X_Offset + j * AsConfig::Cell_Width;
+					brick_rect.top = AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height;
+					brick_rect.right = brick_rect.left + AsConfig::Brick_Width;
+					brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height;
+
+					if (IntersectRect(&intersection_rect, &paint_area, &brick_rect))
+				Draw_Brick(hdc, brick_rect, (EBrick_Type)Current_Level[i][j]);
+	
+
+
 
 		for (i = 0; i < AsConfig::Max_Action_Brick_Count; i++)
 		{
@@ -292,6 +305,38 @@ void ALevel::Draw(HDC hdc, RECT& paint_area)
 		if (Falling_Letter[i] != 0)
 			Falling_Letter[i]->Draw(hdc, paint_area);
 	}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ALevel::Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type)
+{
+	HPEN pen;
+	HBRUSH brush;
+
+	switch (brick_type)
+	{
+	case EBT_None:
+		pen = AsConfig::BG_Pen;
+		brush = AsConfig::BG_Brush;
+		break;
+
+
+	case EBT_Yellow:
+		pen = AsConfig::Purple_Brick_Pen;
+		brush = AsConfig::Purple_Brick_Brush;
+		break;
+
+	case EBT_Blue:
+		pen = AsConfig::Blue_Brick_Pen;
+		brush = AsConfig::Blue_Brick_Brush;
+		break;
+
+	default: 
+		return;
+
+	}
+	SelectObject(hdc, pen);
+	SelectObject(hdc, brush);
+	RoundRect(hdc, brick_rect.left, brick_rect.top, brick_rect.right - 1, brick_rect.bottom - 1, 10, 32);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Set_Current_Level(char Level[AsConfig::Level_Height][AsConfig::Level_Width])
@@ -521,38 +566,5 @@ bool ALevel::Check_Horizontal_Hit(double next_x_pos, double next_y_pos, int leve
 		}
 		return false;
 	}
-}
-//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Draw_Brick(HDC hdc, int x, int y, EBrick_Type brick_type)
-//	Вывод кирпича
-{
-	HPEN pen;
-	HBRUSH brush;
-
-	switch (brick_type)
-	{
-	case EBT_None:
-		pen = AsConfig::BG_Pen;
-		brush = AsConfig::BG_Brush;
-		break;
-
-
-	case EBT_Yellow:
-		pen = AsConfig::Purple_Brick_Pen;
-		brush = AsConfig::Purple_Brick_Brush;
-		break;
-
-	case EBT_Blue:
-		pen = AsConfig::Blue_Brick_Pen;
-		brush = AsConfig::Blue_Brick_Brush;
-		break;
-
-	default: 
-		return;
-
-	}
-	SelectObject(hdc, pen);
-	SelectObject(hdc, brush);
-	RoundRect(hdc, x, y, AsConfig::Brick_Width + x - 1, AsConfig::Brick_Height + y - 1, 10, 32);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

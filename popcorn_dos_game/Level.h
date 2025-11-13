@@ -10,14 +10,20 @@ enum ELetter_Type
 	ELT_O,
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class AFalling_Letter
+//
+//
+//
+//-------------------class AFalling_Letter
+//
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+class AFalling_Letter: public AGraphics_Object
 {
 public:
 	AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y);
 
-	void Act();
-	void Draw(HDC hdc, RECT& paint_area);
-	bool Is_Finished();
+	virtual void Act();
+	virtual void Draw(HDC hdc, RECT& paint_area);
+	virtual bool Is_Finished();
 
 	const ELetter_Type Letter_Type;
 	const EBrick_Type Brick_Type;
@@ -36,6 +42,12 @@ private:
 	void Draw_Brick_Letter(HDC hdc);
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+//
+//
+//
+//-------------------class ALevel
+//
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class ALevel: public AHit_Checker
 {
 public:
@@ -53,7 +65,6 @@ public:
 
 	RECT Level_Rect;
 
-
 private:
 	bool Add_Falling_Letter(int brick_x, int brick_y, EBrick_Type brick_type);
 	bool Check_Vertical_Hit(double next_x_pos, double next_y_pos, int level_x, int level_y, ABall *ball, double &reflect_pos);
@@ -61,7 +72,7 @@ private:
 
 	void On_Hit(int brick_x, int brick_y);
 	void Add_Active_Brick(int brick_x, int brick_y, EBrick_Type brick_type);
-	void Draw_Brick(HDC hdc, int x, int y, EBrick_Type brick_type);
+	void Draw_Brick(HDC hdc, RECT &brick_rect, EBrick_Type brick_type);
 
 	RECT paint_area;
 
@@ -76,5 +87,7 @@ private:
 	int Falling_Brick_Count;
 	AFalling_Letter *Falling_Letter[AsConfig::Max_Falling_Letter_Count];
 
+
+	AGraphics_Object **Graphics_Objects;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
