@@ -85,26 +85,17 @@ void AsEngine::Draw_Frame(HDC hdc, RECT& paint_area)
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 int AsEngine::On_Key_Down(EKey_Type key_type)
 {
-	int offset_x_platform = 32;
-
 	// Platform movement from pressing WINDOW_Keys_Virtual
 	switch (key_type)
 	{
 	case EKT_Left:
-		Platform.X_Pos -= Platform.X_Step;
 
-		if (Platform.X_Pos <= AsConfig::Border_X_Offset)
-			Platform.X_Pos = AsConfig::Border_X_Offset;
-
-		Platform.Redraw_Platform();
+		Platform.Move(true);
 		break;
 
 	case EKT_Right:
-		Platform.X_Pos += Platform.X_Step;
-		if (Platform.X_Pos >= AsConfig::Max_X_Pos - Platform.Width + offset_x_platform)
-			Platform.X_Pos = AsConfig::Max_X_Pos - Platform.Width + offset_x_platform;
 
-		Platform.Redraw_Platform();
+		Platform.Move(false);
 		break;
 
 	case EKT_Space:

@@ -52,6 +52,30 @@ bool AsPlatform::Check_Hit(double next_x_pos, double next_y_pos, ABall *ball)
 	return false;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool AsPlatform::Move(bool move_left)
+{
+	int offset_x_platform = 32;
+
+	if (move_left == true)
+	{
+		X_Pos -= X_Step;
+
+		if (X_Pos <= AsConfig::Border_X_Offset)
+			X_Pos = AsConfig::Border_X_Offset;
+
+		Redraw_Platform();
+	}
+	else
+	{
+		X_Pos += X_Step;
+		if (X_Pos >= AsConfig::Max_X_Pos - Width + offset_x_platform)
+			X_Pos = AsConfig::Max_X_Pos - Width + offset_x_platform;
+
+		Redraw_Platform();
+	}
+	return true;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Init()
 {
 	AsConfig::Create_Pen_Brush(Platform_Circle_Pen_Color, Platform_Circle_Pen, Platform_Circle_Brush);
@@ -235,7 +259,6 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 	int stroke_len;
 
 	HPEN color_pen;
-	COLORREF pixel;
 	COLORREF bg_pixel = RGB(AsConfig::BG_Color.R, AsConfig::BG_Color.G, AsConfig::BG_Color.B);
 
 	max_platform_y = AsConfig::Max_Y_Pos + 3; 
