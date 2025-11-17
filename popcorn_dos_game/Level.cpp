@@ -235,42 +235,30 @@ void ALevel::Init()
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Act()
 {
+	ObjectsToAct(AsConfig::Max_Action_Brick_Count, (AGraphics_Object **)&Action_Brick);
+	ObjectsToAct(AsConfig::Max_Falling_Letter_Count, (AGraphics_Object **)&Falling_Letter);
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ALevel::ObjectsToAct(int object_max_count, AGraphics_Object **object_array)
+{
 	int i;
-
-	for (i = 0; i < AsConfig::Max_Action_Brick_Count; i++)
+	for (i = 0; i < object_max_count; i++)
 	{
-		if (Action_Brick[i] != 0)
+		if (object_array[i] != 0)
 		{
-			Action_Brick[i]->Act();
+			object_array[i]->Act();
 
-			if (Action_Brick[i]->Is_Finished() )
+			if (object_array[i]->Is_Finished())
 			{
-				delete Action_Brick[i];
-				Action_Brick[i] = 0;
-				--Action_Brick_Count;
-			}
-		}
-	}
-
-	//!!! Copy Logic
-// Encapsulated logic for animating level elements (active bricks)
-	for (i = 0; i < AsConfig::Max_Falling_Letter_Count; i++)
-	{
-		if (Falling_Letter[i] != 0)
-		{
-			Falling_Letter[i]->Act();
-
-			if (Falling_Letter[i]->Is_Finished())
-			{
-				delete Falling_Letter[i];
-				Falling_Letter[i] = 0;
-				--Falling_Brick_Count;
+				delete object_array[i];
+				object_array[i] = 0;
+				--object_array;
 			}
 		}
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void ALevel::Draw(HDC hdc, RECT& paint_area)
+void ALevel::Draw(HDC hdc, RECT &paint_area)
 {
 	int i, j;
 	RECT intersection_rect, brick_rect;
@@ -280,30 +268,28 @@ void ALevel::Draw(HDC hdc, RECT& paint_area)
 
 		for (i = 0; i < AsConfig::Level_Height; i++)
 			for (j = 0; j < AsConfig::Level_Width; j++)
-
+			{
 					brick_rect.left = AsConfig::Level_X_Offset + j * AsConfig::Cell_Width;
 					brick_rect.top = AsConfig::Level_Y_Offset + i * AsConfig::Cell_Height;
 					brick_rect.right = brick_rect.left + AsConfig::Brick_Width;
 					brick_rect.bottom = brick_rect.top + AsConfig::Brick_Height;
 
-					if (IntersectRect(&intersection_rect, &paint_area, &brick_rect))
+					if (IntersectRect(&intersection_rect, &paint_area, &brick_rect) )
 				Draw_Brick(hdc, brick_rect, (EBrick_Type)Current_Level[i][j]);
-	
+			}
 
-
-
-		for (i = 0; i < AsConfig::Max_Action_Brick_Count; i++)
-		{
-			if (Action_Brick[i] != 0)
-				Action_Brick[i]->Draw(hdc, paint_area);
-		}
+		Draw_Graphics_Objects(hdc, paint_area, (AGraphics_Object**)&Action_Brick , AsConfig::Max_Action_Brick_Count);
 	}
-
-	//!!! Copy Logic
-	for (i = 0; i < AsConfig::Max_Falling_Letter_Count; i++)
+				Draw_Graphics_Objects(hdc, paint_area, (AGraphics_Object**)&Falling_Letter , AsConfig::Max_Falling_Letter_Count);
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void ALevel::Draw_Graphics_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array ,int object_max_count)
+{
+	int i;
+	for (i = 0; i < object_max_count; i++)
 	{
-		if (Falling_Letter[i] != 0)
-			Falling_Letter[i]->Draw(hdc, paint_area);
+		if (objects_array[i] != 0)
+			objects_array[i]->Draw(hdc, paint_area);
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

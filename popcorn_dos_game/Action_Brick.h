@@ -25,6 +25,7 @@ enum EBrick_Type
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 class AGraphics_Object
 {
+public:
 	virtual void Draw(HDC hdc, RECT& paint_area) = 0;
 	virtual void Act() = 0;
 	virtual bool Is_Finished() = 0;
@@ -59,7 +60,7 @@ private:
 	static unsigned char Get_Fading_Channel_Color(unsigned char color, unsigned char bg_color, int step);
 	static void Get_Fading_Color(const AColor &color, int step, HPEN &pen, HBRUSH &brush);
 
-	static const int Fade_Brick_Step = 80;
+	static const int Fade_Brick_Step = AsConfig::FPS;
 
 	static HPEN Fading_Blue_Brick_Pens[Fade_Brick_Step];
 	static HBRUSH Fading_Blue_Brick_Brushes[Fade_Brick_Step];

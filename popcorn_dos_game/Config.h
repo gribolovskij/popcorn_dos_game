@@ -67,6 +67,6 @@ public:
 	static const int Max_Action_Brick_Count = 10;
 	static const int Offset_X_Ball_For_Ready = 15;
 	static const int Max_Falling_Letter_Count = 10;
-	static const int Hits_Per_Letter = 1;
+	static const int Hits_Per_Letter = 3;
 };
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

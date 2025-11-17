@@ -9,6 +9,16 @@ AsEngine::AsEngine()
 void AsEngine::Init(HWND hwnd)
 //	Initialization function |=|=|=| Setting up the game at startup
 {
+	// RANDOM!
+	SYSTEMTIME sys_time;
+	FILETIME file_time;
+
+	GetSystemTime(&sys_time);
+	SystemTimeToFileTime(&sys_time, &file_time);
+
+	srand(file_time.dwLowDateTime);
+	//!
+	
 	AsConfig::Hwnd = hwnd;
 
 	AAction_Brick::Setup_Colors();
