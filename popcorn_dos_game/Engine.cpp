@@ -151,11 +151,28 @@ int AsEngine::On_Timer()
 		break;
 	}
 
+	Act();
+
+	return 0;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AsEngine::Act()
+{
+	AFalling_Letter *falling_letter;
+	int index = 0;
+
 	Platform.Act();
 	Level.Act();
 
-
-
-	return 0;
+	while (Level.Get_Falling_Letter(index ,&falling_letter) )
+	{
+		if (Platform.Hit_Falling_Letter(falling_letter) )
+		Take_Falling_Letter(falling_letter);
+	}
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool AsEngine::Take_Falling_Letter(AFalling_Letter *falling_letter)
+{
+	falling_letter->Got_Hit = true;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

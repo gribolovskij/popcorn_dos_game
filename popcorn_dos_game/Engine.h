@@ -35,6 +35,8 @@ public:
 	int On_Timer();
 
 private:
+	void Act();
+	bool Take_Falling_Letter(AFalling_Letter *falling_letter);
 	EGame_State Game_State;
 
 	ABall Ball;

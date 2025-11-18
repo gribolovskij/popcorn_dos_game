@@ -108,6 +108,15 @@ void ALevel::Draw(HDC hdc, RECT &paint_area)
 				Draw_Graphics_Objects(hdc, paint_area, (AGraphics_Object**)&Falling_Letter , AsConfig::Max_Falling_Letter_Count);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+bool ALevel::Get_Falling_Letter(int &index, AFalling_Letter **falling_letter)
+{
+	*falling_letter = Falling_Letter[index++];
+		return true;
+
+	
+
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void ALevel::Draw_Graphics_Objects(HDC hdc, RECT &paint_area, AGraphics_Object **objects_array ,int object_max_count)
 {
 	int i;
