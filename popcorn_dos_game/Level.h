@@ -7,13 +7,13 @@
 //
 //
 //
-//-------------------class ALevel
+//-------------------class AsLevel
 //
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-class ALevel: public AHit_Checker
+class AsLevel: public AHit_Checker
 {
 public:
-	ALevel();
+	AsLevel();
 
 	void Draw(HDC hdc, RECT& paint_area);
 	bool Get_Falling_Letter(int &index, AFalling_Letter **falling_letter);

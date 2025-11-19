@@ -5,7 +5,7 @@
 // 
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 AFalling_Letter::AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_type, int x, int y)
-	: Brick_Type(brick_type), Letter_Type(letter_type), X(x), Y(y), Got_Hit(false), Rotation_Step(2), Next_Rotation_Tick(AsConfig::Tick_Current_Timer + Tick_Per_Step)
+	: Brick_Type(brick_type), Letter_Type(letter_type), X(x), Y(y), Rotation_Step(2), Next_Rotation_Tick(AsConfig::Tick_Current_Timer + Tick_Per_Step), Falling_Letter_State(EFLS_Normal)
 {
 	Letter_Cell.left = X;
 	Letter_Cell.top = Y;
@@ -17,6 +17,15 @@ AFalling_Letter::AFalling_Letter(EBrick_Type brick_type, ELetter_Type letter_typ
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AFalling_Letter::Act()
 {
+	if (Falling_Letter_State != EFLS_Normal)
+		return;
+
+	if (Letter_Cell.top >= AsConfig::Max_Y_Pos)
+	{
+		Finalize_Letter();
+		return;
+	}
+
 	Prev_Letter_Cell = Letter_Cell;
 
 	Y += 5;
@@ -38,6 +47,7 @@ void AFalling_Letter::Draw(HDC hdc, RECT& paint_area)
 {
 	RECT intersection_rect;
 
+	// Clear bg
 	if (IntersectRect(&intersection_rect, &paint_area, &Prev_Letter_Cell))
 	{
 		SelectObject(hdc, AsConfig::BG_Pen);
@@ -46,17 +56,35 @@ void AFalling_Letter::Draw(HDC hdc, RECT& paint_area)
 		Rectangle(hdc, Prev_Letter_Cell.left, Prev_Letter_Cell.top, Prev_Letter_Cell.right, Prev_Letter_Cell.bottom);
 	}
 
+	if (Falling_Letter_State == EFLS_Finalize)
+	{
+		Falling_Letter_State = EFLS_Finished;
+		return;
+	}
+
 	if (IntersectRect(&intersection_rect, &paint_area, &Letter_Cell))
 		Draw_Brick_Letter(hdc);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 bool AFalling_Letter::Is_Finished()
 {
-	if (Got_Hit || Letter_Cell.top >= AsConfig::Max_Y_Pos)
-
+	if (Falling_Letter_State == EFLS_Finished)
 		return true;
-	else
+	else 
 		return false;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AFalling_Letter::Get_Letter(RECT &rect)
+{
+	rect = Letter_Cell;
+}
+//-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+void AFalling_Letter::Finalize_Letter()
+{
+	Falling_Letter_State = EFLS_Finalize;
+
+	InvalidateRect(AsConfig::Hwnd, &Prev_Letter_Cell, FALSE);
+	InvalidateRect(AsConfig::Hwnd, &Letter_Cell, FALSE);
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AFalling_Letter::Draw_Brick_Letter(HDC hdc)

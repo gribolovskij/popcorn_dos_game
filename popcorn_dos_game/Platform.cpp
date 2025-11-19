@@ -56,6 +56,9 @@ bool AsPlatform::Move(bool move_left)
 {
 	int offset_x_platform = 32;
 
+	if (Platform_State != EPS_Normal)
+		return false;
+
 	if (move_left == true)
 	{
 		X_Pos -= X_Step;
@@ -189,9 +192,16 @@ void AsPlatform::Draw(HDC hdc, RECT& paint_area)
 	}
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-void Hit_Falling_Letter(AFalling_Letter *falling_letter)
+bool AsPlatform::Hit_Falling_Letter(AFalling_Letter *falling_letter)
 {
+	RECT intersection_rect, falling_letter_rect;
+	
+	falling_letter -> Get_Letter(falling_letter_rect);
 
+	if (IntersectRect(&intersection_rect, &falling_letter_rect, &Platform_Rect) )
+		return true;
+	else
+		return false;
 }
 //-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 void AsPlatform::Draw_Highlight(HDC hdc, int x, int y)
@@ -284,7 +294,6 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 
 	// Drawing subsequence vertical strokes different colors.
 	while (Get_Platform_Image_Stroke_Color(i, j, color_pen, stroke_len) )
-
 		{
 			SelectObject(hdc, color_pen);
 
@@ -293,7 +302,6 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 			y += stroke_len;
 			j += stroke_len;
 		}
-
 	// Clean BG after Meltdown_Platform
 
 	y = Meltdown_Platform_Y_Pos[i];
@@ -301,7 +309,6 @@ void AsPlatform::Draw_Meltdown_State(HDC hdc, RECT& paint_area)
 	SelectObject(hdc, AsConfig::BG_Pen);
 	LineTo(hdc, x, y + y_offset);
 	Meltdown_Platform_Y_Pos[i] += y_offset;
-
 	}
 
 	if (moved_col_count == 0)
